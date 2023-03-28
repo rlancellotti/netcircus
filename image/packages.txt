@@ -1,0 +1,5 @@
+net-tools
+vim
+bash
+apache2
+dnsmasq
