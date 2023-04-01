@@ -3,9 +3,9 @@ import threading
 import os
 import json
 
-PATH = os.path.expanduser('~/SimNet')
-SAVE_PATH = os.path.expanduser('~/SimNet/Projects')
-RESOURCE_PATH = os.path.expanduser('~/SimNet/Resources')
+PATH = os.path.expanduser('~/.netcircus')
+SAVE_PATH = os.path.expanduser('~/.netcircus/Projects')
+RESOURCE_PATH = os.path.expanduser('~/.netcircus/Resources')
 FS1 = RESOURCE_PATH + '/rootfs.ext4'
 KER1 = RESOURCE_PATH + '/linux'
 KER2 = RESOURCE_PATH + '/linux-3.18.20-mod'
@@ -30,18 +30,18 @@ class Controller(threading.Thread):
         time.sleep(1)
         for h in self.net.hosts:
             if not h.check():
-                print(h.name + ' non è partito correttamente')
+                print(h.name + ' not started correctly')
                 return False
             else:
                 self.hosts_states[h] = 'opened'
-                print(h.name + " è partito correttamente")
+                print(h.name + " started correctly")
         for s in self.net.switches:
             if not s.check():
-                print(s.name + ' non è partito correttamente')
+                print(s.name + ' not started correctly')
                 return False
             else:
                 self.switches_states[s] = 'opened'
-                print(s.name + " è partito correttamente")
+                print(s.name + " started correctly")
         return True
 
     def run(self):

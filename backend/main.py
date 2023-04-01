@@ -3,9 +3,9 @@ import os
 import time
 import string
 
-PATH = os.path.expanduser('~/SimNet')
-Resources_PATH = os.path.expanduser('~/SimNet/Resources')
-SProjects_PATH = os.path.expanduser('~/SimNet/Projects')
+PATH = os.path.expanduser('~/.netcircus')
+RESOURCE_PATH = os.path.expanduser('~/.netcircus/Resources')
+SAVE_PATH = os.path.expanduser('~/.netcircus/Projects')
 
 
 def check_string(s):
@@ -20,19 +20,19 @@ def main():
 
     if not os.path.exists(PATH):
         os.makedirs(PATH)
-        os.makedirs(SProjects_PATH)
-        os.makedirs(Resources_PATH)
+        os.makedirs(SAVE_PATH)
+        os.makedirs(RESOURCE_PATH)
     else:
-        if not os.path.exists(SProjects_PATH):
-            os.makedirs(SProjects_PATH)
-        if not os.path.exists(Resources_PATH):
-            os.makedirs(Resources_PATH)
+        if not os.path.exists(SAVE_PATH):
+            os.makedirs(SAVE_PATH)
+        if not os.path.exists(RESOURCE_PATH):
+            os.makedirs(RESOURCE_PATH)
 
-    if not os.path.exists(Resources_PATH + '/rootfs.ext4'):
+    if not os.path.exists(RESOURCE_PATH + '/rootfs.ext4'):
         print('è necessario scaricare un filesystem funzionante')
         return
 
-    if not os.path.exists(Resources_PATH + '/linux'):
+    if not os.path.exists(RESOURCE_PATH + '/linux'):
         print('è necessario scaricare un kernel funzionante')
         return
 
@@ -44,7 +44,7 @@ def main():
         print(net_name + ' Invalid name project')
         return 1
 
-    net_path = SProjects_PATH + '/' + net_name
+    net_path = SAVE_PATH + '/' + net_name
 
     network = cl.Network(net_name)
 
