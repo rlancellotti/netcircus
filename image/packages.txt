@@ -3,3 +3,4 @@ vim
 bash
 apache2
 dnsmasq
+dbus

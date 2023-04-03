@@ -1,0 +1,17 @@
+[Unit]
+Description=Update hostname
+After=systemd-hostnamed.service
+
+# If additional gettys are spawned during boot then we should make
+# sure that this is synchronized before getty.target, even though
+# getty.target didn't actually pull it in.
+Conflicts=rescue.service
+Before=rescue.service
+
+[Service]
+Type=exec
+ExecStart=-/usr/local/bin/circus_set_hostname.sh
+StandardOutput=journal
+
+[Install]
+WantedBy=sysinit.target
