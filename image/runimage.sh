@@ -15,7 +15,7 @@ if [ ${ROOTFS} -nt ${COWFILE} ]; then
 fi
 # RUN
 #${KERNEL} ubd0=${COWFILE},${ROOTFS} con1=xterm umid=uml1 hostname=test
-${KERNEL} ubd0=${COWFILE},${ROOTFS} con1=xterm umid=uml1
+${KERNEL} ubd0=${COWFILE},${ROOTFS} con1=xterm umid=uml1 hostname=test
 
 
 

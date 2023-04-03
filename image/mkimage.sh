@@ -18,8 +18,13 @@ sudo mount ${FSNAME} ${MNTPOINT} -o loop
 if [ "${UPDATE_ONLY}" != "True" ] ; then
     sudo debootstrap --include ${PKG} --arch ${ARCH} stable ${MNTPOINT}
 fi
-# set default hostname
+# set default hostname and prepare update...
 sudo sh -c "echo uml1 > ${MNTPOINT}/etc/hostname"
+#sudo mkdir -p ${MNTPOINT}/usr/local/bin/
+sudo cp ${RESDIR}/circus_set_hostname.sh ${MNTPOINT}/usr/local/bin/
+sudo chmod a+x ${MNTPOINT}/usr/local/bin/circus_set_hostname.sh
+sudo cp ${RESDIR}/circus_hostname.service ${MNTPOINT}/lib/systemd/system
+sudo ln -fs /lib/systemd/system/circus_hostname.service ${MNTPOINT}/etc/systemd/system/sysinit.target.wants/
 # filesystem tuning
 sudo sh -c "echo \"/dev/ubda / ext4 errors=remount-ro 0 1\" > ${MNTPOINT}/etc/fstab"
 sudo sh -c "echo \"none /run tmpfs defaults,size=64M 0 0\" >> ${MNTPOINT}/etc/fstab"
