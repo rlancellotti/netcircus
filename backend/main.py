@@ -2,10 +2,7 @@ import classes as cl
 import os
 import time
 import string
-
-PATH = os.path.expanduser('~/.netcircus')
-RESOURCE_PATH = os.path.expanduser('~/.netcircus/Resources')
-SAVE_PATH = os.path.expanduser('~/.netcircus/Projects')
+import netcircus_paths
 
 
 def check_string(s):
@@ -17,34 +14,23 @@ def check_string(s):
 
 
 def main():
-
-    if not os.path.exists(PATH):
-        os.makedirs(PATH)
-        os.makedirs(SAVE_PATH)
-        os.makedirs(RESOURCE_PATH)
-    else:
-        if not os.path.exists(SAVE_PATH):
-            os.makedirs(SAVE_PATH)
-        if not os.path.exists(RESOURCE_PATH):
-            os.makedirs(RESOURCE_PATH)
-
-    if not os.path.exists(RESOURCE_PATH + '/rootfs.ext4'):
-        print('è necessario scaricare un filesystem funzionante')
-        return
-
-    if not os.path.exists(RESOURCE_PATH + '/linux'):
-        print('è necessario scaricare un kernel funzionante')
-        return
+    # FIXME: stronger check for filesystem existence
+    if not os.path.exists(netcircus_paths.PATH):
+        os.makedirs(netcircus_paths.PATH)
+        os.makedirs(netcircus_paths.SAVE_PATH)
+        os.makedirs(netcircus_paths.FS_PATH)
+        os.makedirs(netcircus_paths.KERNEL_PATH)
 
     #cl.load(SProjects_PATH + '/eheh/arc_eheh_SimNet.tgz')
 
-    net_name = input('dai un nome al progetto ')
+    #net_name = input('dai un nome al progetto ')
+    net_name = 'test'
 
-    if not check_string(net_name):
-        print(net_name + ' Invalid name project')
-        return 1
+    #if not check_string(net_name):
+    #    print(net_name + ' Invalid name project')
+    #    return 1
 
-    net_path = SAVE_PATH + '/' + net_name
+    net_path = netcircus_paths.SAVE_PATH + '/' + net_name
 
     network = cl.Network(net_name)
 
@@ -87,37 +73,61 @@ def main():
             print(c.name + ' invalid name')
             return 1
 
-    controll = cl.Controller(network)
+    ctrl = cl.Controller(network)
     network.start_up()
 
-    if not controll.check_start():
+    if not ctrl.check_start():
         network.shutdown()
         print('errore in avvio, riprovare')
         return 1
 
-    controll.start()
+    ctrl.start()
 
-    """
     if input('interrompere? ') == 'si':
         network.shutdown()
 
     if input('ripartire? ') == 'si':
         network.start()
-    """
 
     if input('spengere il network in modo pulito?\n ') == 'si':
         # if input('vuoi salvare? ') == 'si':
             # cl.save(network, net_path, True)
 
-        controll.set_active(False)
+        ctrl.set_active(False)
         time.sleep(1)
         network.shutdown()
     else:
-        controll.set_active(False)
+        ctrl.set_active(False)
         time.sleep(1)
         network.poweroff()
 
     return
 
+def simple_main():
+    net_name = 'test'
+    net_path = f'{netcircus_paths.SAVE_PATH}/{net_name}'
+    network = cl.Network(net_name)
+    host1 = cl.Host(net_name, 'host1', '', mem=96, ndisks=1)
+    #host2 = cl.Host(net_name, 'host2', '', mem=96, ndisks=1)
+    switch1 = cl.Switch('switch1', '', 4)
+    network.add(host1)
+    #network.add(host2)
+    network.add(switch1)
+    network.add(cl.Cable('cable1', host1, 0, switch1, 1))
+    #network.add(cl.Cable('cable2', host2, 0, switch1, 2))
 
-main()
+    ctrl = cl.Controller(network)
+    network.start_up()
+    print('Network is up')
+    ctrl.start()
+    print('End of ctrl()')
+    time.sleep(5)
+    print('End of main()')
+    #ctrl.set_active(False)
+    #time.sleep(1)
+    #network.shutdown()
+
+
+if __name__ == '__main__':
+    #main()
+    simple_main()

@@ -8,5 +8,5 @@ for i in $(cat /proc/cmdline | tr '\000' ' '); do
 done
 if [ -n "${HOSTNAME}" ] ; then
     hostnamectl --static set-hostname ${HOSTNAME}
-    echo "updating hostname: RC=$?" >> ${LOG}
+    #echo "updating hostname: RC=$?" >> ${LOG}
 fi
