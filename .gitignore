@@ -6,3 +6,5 @@ image/prova1/**
 *.mar
 *.tgz
 prepare
+**/__pycache__/
+image/marionnet_rclocal.sh
