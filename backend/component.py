@@ -22,7 +22,7 @@ class Component:
         self.cmdline = ''
 
     def launch(self):
-        os.system("x-terminal-emulator -t " + self.name + " -e \"" + self.cmdline + "\"")
+        os.system(f'x-terminal-emulator -T {self.name} -e \"{self.cmdline}\"')
 
     def command(self, command):
         pass
