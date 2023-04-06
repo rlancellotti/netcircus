@@ -1,6 +1,9 @@
 import netcircus_paths
 import component
 import socket
+import os
+import time
+import threading
 
 class Host(component.Component):
     mac_counter = 0
@@ -38,18 +41,19 @@ class Host(component.Component):
         self.command_queue=[]
         self.cmdline = self.kernel + f' mem={self.mem}M '
 
-        self.socketname=f'/tmp/socket_ready_{self.name}.s'
+        self.ready_socket_name=f'{netcircus_paths.WORKAREA}/socket_ready_{self.name}.s'
         for i in range(ndisks):
-            disk = self.project + '_' + self.name + '_disk' + str(i)
-            self.cmdline = self.cmdline + f'ubd{str(i)}=/tmp/{disk}.cow,{self.fs} '
-        self.cmdline = self.cmdline + f'umid={self.console} con1=xterm mconsole=notify:{self.socketname} hostname={self.name}'
+            disk_name = f'{self.project}_{self.name}_disk{i}'
+            self.cmdline = self.cmdline + f'ubd{i}={netcircus_paths.WORKAREA}/{disk_name}.cow,{self.fs} '
+        self.cmdline = self.cmdline + f'umid={self.console} con1=xterm mconsole=notify:{self.ready_socket_name} hostname={self.name}'
         self.set_ready_socket()
         print(self.cmdline)
 
     def wait_ready(self):
         print('entering call to wait_ready')
-        data = self.sock.recv(1024)
-        print(data[16:].decode('utf-8'))
+        data = self.ready_sock.recv(1024)
+        #self.console=data[16:].decode('utf-8')
+        #print (self.console)
         self.ready=True
         time.sleep(1)
         for c in self.command_queue:
@@ -58,16 +62,17 @@ class Host(component.Component):
         print('end call to set_ready')
 
     def set_ready_socket(self):
-        if os.path.exists(self.socketname):
-            os.remove(self.socketname)
-        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
-        self.sock.bind(self.socketname)
-        print(f'call to set_ready_socket on {str(self.sock)}')
+        if os.path.exists(self.ready_socket_name):
+            os.remove(self.ready_socket_name)
+        self.ready_sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
+        print(self.ready_socket_name)
+        self.ready_sock.bind(self.ready_socket_name)
+        print(f'call to set_ready_socket on {str(self.ready_sock)}')
         threading.Thread(target=self.wait_ready, daemon=True).start()
-        #asyncio.run(asyncio.start_server(self.set_ready, sock=sock))
 
     def log_command(self, command, success):
         adj='successful' if success else 'failed'
+        #print(f'{adj} command: "{command}"')
         if not command.startswith('version'):
             print(f'{adj} command: "{command}"')
 
@@ -83,5 +88,5 @@ class Host(component.Component):
         self.log_command(command, rv)
         return rv
 
-    def connect_to_switch(self, myPort, component, hisPort):
-        self.command(f'config eth{str(myPort)}=vde,/tmp/{component},{Host.get_mac()},{str(hisPort)}')
+    def connect_to_switch(self, host_port, component, switch_port):
+        self.command(f'config eth{host_port}=vde,{netcircus_paths.WORKAREA}/{component},{Host.get_mac()},{switch_port}')

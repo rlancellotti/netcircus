@@ -30,7 +30,7 @@ class Cable:
         self.name = self.type + '_' + name
 
     def make_switches_connection(self):
-        os.system(f'dpipe vde_plug /home/riccardo/.uml{self.A.name}= vde_plug /tmp/{self.B.name}')
+        os.system(f'dpipe vde_plug {netcircus_paths.WORKAREA}/{self.A.name} = vde_plug {netcircus_paths.WORKAREA}/{self.B.name}')
 
     def make_host_switch_connection(self):
         self.A.connect_to_switch(self.port_A, self.B.name, self.port_B)
