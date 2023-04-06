@@ -112,24 +112,24 @@ def simple_main():
     #net_path = f'{netcircus_paths.SAVE_PATH}/{net_name}'
     network = Network(net_name)
     host1 = Host(net_name, 'host1', '', mem=96, ndisks=1)
-    #host2 = Host(net_name, 'host2', '', mem=96, ndisks=1)
+    host2 = Host(net_name, 'host2', '', mem=96, ndisks=1)
     switch1 = Switch('switch1', '', 4)
     network.add(host1)
-    #network.add(host2)
+    network.add(host2)
     network.add(switch1)
     network.add(Cable('cable1', host1, 0, switch1, 1))
-    #network.add(cl.Cable('cable2', host2, 0, switch1, 2))
+    network.add(Cable('cable2', host2, 0, switch1, 2))
 
     ctrl = Controller(network)
     network.start_up()
     print('Network is up')
     ctrl.start()
     print('End of ctrl()')
-    time.sleep(5)
-    print('End of main()')
+    time.sleep(10)
     #ctrl.set_active(False)
     #time.sleep(1)
     #network.shutdown()
+    print('End of main()')
 
 
 if __name__ == '__main__':
