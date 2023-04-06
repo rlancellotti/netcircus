@@ -45,10 +45,16 @@ class Host(component.Component):
         for i in range(ndisks):
             disk_name = f'{self.project}_{self.name}_disk{i}'
             self.cmdline = self.cmdline + f'ubd{i}={netcircus_paths.WORKAREA}/{disk_name}.cow,{self.fs} '
-        self.cmdline = self.cmdline + f'umid={self.console} con1=xterm mconsole=notify:{self.ready_socket_name} hostname={self.name}'
+            self.check_cow(f'{netcircus_paths.WORKAREA}/{disk_name}.cow', self.fs)
+        self.cmdline = self.cmdline + f'umid={self.console} mconsole=notify:{self.ready_socket_name} hostname={self.name}'
         self.set_ready_socket()
         print(self.cmdline)
 
+    def check_cow(self, cow, fs):
+        if os.path.exists(cow) and (os.path.getmtime(fs) > os.path.getmtime(cow)):
+            print(f'backing file {fs} is newer than cow {cow}')
+            os.remove(cow)
+    
     def wait_ready(self):
         print('entering call to wait_ready')
         data = self.ready_sock.recv(1024)
