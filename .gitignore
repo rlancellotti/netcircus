@@ -1,10 +1,10 @@
 image/*.svg
 image/*.ext4
 image/*.dot
-image/*.cow
 image/prova1/**
 *.mar
 *.tgz
 prepare
 **/__pycache__/
 image/marionnet_rclocal.sh
+*.cow

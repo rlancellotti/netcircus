@@ -24,17 +24,17 @@ class Switch(component.Component):
         daemon = '' if self.terminal else '-daemon'
         hub = '-hub' if self.is_hub else ''
         #FIXME: use correct paths
-        self.cmdline = f"/usr/bin/vde_switch {daemon} -n {str(self.n_ports)} {hub} -s /tmp/{self.name} --mgmt /tmp/{self.console}.mgmt"
+        self.cmdline = f"vde_switch {daemon} -n {str(self.n_ports)} {hub} -s {netcircus_paths.WORKAREA}/{self.name} --mgmt {netcircus_paths.WORKAREA}/{self.console}.mgmt"
         print(self.cmdline)
 
     def command(self, command):
         # 65280 exit status comando unixcmd
-        if os.system("unixcmd -s /tmp/" + self.console + ".mgmt -f /etc/vde2/vdecmd " + command) == 65280:
+        if os.system(f'unixcmd -s {netcircus_paths.WORKAREA}/{self.console}.mgmt -f /etc/vde2/vdecmd {command}') == 65280:
             return True
         return False
 
     def halt(self):
-        os.system("pgrep -f /tmp/" + self.name + " | xargs kill -TERM")
+        os.system(f'pgrep -f {netcircus_paths.WORKAREA}/self.name | xargs kill -TERM')
 
     def check(self):
-        return os.path.exists('/tmp/' + self.console + '.mgmt')
+        return os.path.exists(f'{netcircus_paths.WORKAREA}/{self.console}.mgmt')
