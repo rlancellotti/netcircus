@@ -31,7 +31,12 @@ sudo sh -c "echo \"none /run tmpfs defaults,size=64M 0 0\" >> ${MNTPOINT}/etc/fs
 # Fix systemd to run only one terminal with root autologin      
 sudo ln -fs /dev/null ${MNTPOINT}/etc/systemd/system/getty-static.service 
 sudo cp "${RESDIR}/getty@.service" "${MNTPOINT}/lib/systemd/system/"
-sudo mv ${MNTPOINT}/etc/systemd/system/getty.target.wants/getty@tty1.service ${MNTPOINT}/etc/systemd/system/getty.target.wants/getty@tty0.service
+if [ -e ${MNTPOINT}/etc/systemd/system/getty.target.wants/getty@tty1.service ] ; then
+    sudo mv ${MNTPOINT}/etc/systemd/system/getty.target.wants/getty@tty1.service ${MNTPOINT}/etc/systemd/system/getty.target.wants/getty@tty0.service
+fi
+# set handler for Ctrl + Alt + Del
+sudo sh -c "echo \"CtrlAltDelBurstAction=poweroff-force\" >> ${MNTPOINT}/etc/systemd/system.conf"
+sudo cp "${RESDIR}/reboot.target" "${MNTPOINT}/lib/systemd/system/"
 
 # set password for root
 CPWD=$(openssl passwd -1 -salt xy ${ROOTPWD})
