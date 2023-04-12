@@ -1,8 +1,9 @@
 import netcircus_paths
-import component
+from component import Component
+import logging
 import os
 
-class Switch(component.Component):
+class Switch(Component):
     def __init__(self, network, name=None, label=None, n_ports=None, is_hub=False, terminal=True, dump=None):
         """
 
@@ -11,7 +12,7 @@ class Switch(component.Component):
         :param terminal: False se si vuole nascondere il terminal
 
         """
-        super().__init__()
+        super().__init__(name if name is not None else dump['name'])
         if dump is None:
             self.init_from_parameters(name, label, n_ports, is_hub, terminal)
         else:
@@ -24,7 +25,7 @@ class Switch(component.Component):
         hub = '-hub' if self.is_hub else ''
         #FIXME: use correct paths
         self.cmdline = f"vde_switch {daemon} -n {str(self.n_ports)} {hub} -s {netcircus_paths.WORKAREA}/{self.name} --mgmt {netcircus_paths.WORKAREA}/{self.console}.mgmt"
-        print(self.cmdline)
+        self.log(logging.DEBUG, self.cmdline)
         network.add(self)
 
     def init_from_parameters(self, name, label, n_ports, is_hub, terminal):
