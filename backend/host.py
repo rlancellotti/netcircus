@@ -15,7 +15,7 @@ class Host(Component):
         return  '%s:%02x:%02x:%02x' % (Host.mac_prefix, Host.mac_counter // (256*256), Host.mac_counter // 256, Host.mac_counter % 256)
 
     def __init__(self, network, name=None, label=None, mem=96, dump=None):
-        super().__init__()
+        super().__init__(name if name is not None else dump['name'])
         self.network=network
         if dump is None:
             self.init_from_parameters(network, name, label, mem)

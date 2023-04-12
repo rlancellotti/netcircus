@@ -8,3 +8,5 @@ prepare
 **/__pycache__/
 image/marionnet_rclocal.sh
 *.cow
+*.log
+work/*
