@@ -6,25 +6,17 @@ import os
 import threading
 import time
 import json
+import tarfile
 
 class Network:
-    def __init__(self, name):
+    def __init__(self, name=None, tar_name=None):
+        self.conf_name = f'{netcircus_paths.WORKAREA}/config.json'
         self.name = name
-        self.save_path = netcircus_paths.SAVE_PATH + '/' + name
         self.hosts = []
         self.switches = []
         self.cables = []
-    def create_project_path(self):
-        if os.path.exists(self.save_path):
-            decision = input("il progetto " + self.name + " esiste gia', sovrascrivere? si/no ")
-            if decision == 'no':
-                self.name = input("allora inserire altro nome.. ")
-                self.save_path = netcircus_paths.SAVE_PATH + '/' + self.name
-            elif decision == 'si':
-                os.remove(self.save_path)
-            else:
-                exit(1)
-        os.makedirs(self.save_path)
+        if tar_name is not None:
+            self.load(tar_name)
 
     def add(self, obj):
         if type(obj) == Host:
@@ -38,14 +30,11 @@ class Network:
             return
 
     def start_up(self):
-
         for c in self.hosts + self.switches:
             t = threading.Thread(target=c.launch, args=())
             t.daemon = True
             t.start()
             time.sleep(0.2)
-        # FIXME: must wait for host to be readycomplete their startup
-        #time.sleep(5)
         for c in self.cables:
             if c.type == 'straight':
                 c.make_host_switch_connection()
@@ -59,67 +48,77 @@ class Network:
     def shutdown(self):
         for c in self.hosts + self.switches:
             if c.check():
-                print('spengo in modo pulito ' + c.name)
+                print('Shutting down ' + c.name)
                 c.shutdown()
 
     def poweroff(self):
         for c in self.hosts + self.switches:
             if c.check:
-                print('chiudo forzatamente ' + c.name)
+                print('Force shutdown for ' + c.name)
                 c.halt()
 
 
-def save(net, path, configuration):
-    net.create_project_path()
+    def dump(self):
+        rv = {'network_name': self.name}
+        rv['hosts'] = [h.dump() for h in self.hosts]
+        rv['switches'] = [s.dump() for s in self.switches]
+        rv['cables'] = [c.dump() for c in self.cables]
+        return rv
+    
+    def save(self, tar_name=None):
+        if tar_name is None:
+            tar_name = f'{netcircus_paths.SAVE_PATH}/{self.name}.tgz'
+        with open(self.conf_name, 'w') as f:
+            json.dump(self.dump(), f, indent=2)
+        with tarfile.open(tar_name, 'w:gz', format=tarfile.GNU_FORMAT) as tar:
+            tar.add(self.conf_name, arcname=os.path.basename(self.conf_name))
+            for f in [h.cow for h in self.hosts]:
+                tar.add(f, arcname=os.path.basename(f), filter=filter_cow)
+        # clean files
+        os.remove(self.conf_name)
+        for f in [h.cow for h in self.hosts]:
+            os.remove(f)
 
-    list_host = []
-    list_switch = []
-    list_cable = []
+    def load_config(self):
+        with open(self.conf_name, 'r') as f:
+            conf=json.load(f)
+            self.name=conf['network_name']
+            # hosts
+            for h in conf['hosts']:
+                self.add(Host(self, dump=h))
+            # switches
+            for s in conf['switches']:
+                self.add(Switch(self, dump=s))
+            # cables
+            for c in conf['cables']:
+                self.add(Cable(self, dump=c))
 
-    for h in net.hosts:
-        h_dict = {'name': h.name,
-                  'label': h.label,
-                  'fs': h.fs,
-                  'kernel': h.kernel,
-                  'n_ports': h.n_ports,
-                  'mem': h.mem,
-                  'n_disks': h.n_disks}
-        list_host.append(h_dict)
+    def load(self, tar_name):
+        with tarfile.open(tar_name, 'r:gz') as tar:
+            # restore_config
+            tar.extract(os.path.basename(self.conf_name), path=netcircus_paths.WORKAREA)
+            for f in tar.getmembers():
+                print(get_info(f))
+        # load config
+        self.load_config()
+            
 
-    for s in net.switches:
-        s_dict = {'name': s.name,
-                  'label': s.label,
-                  'n_ports': s.n_ports,
-                  'is_hub,': s.is_hub,
-                  'terminal': s.terminal}
-        list_switch.append(s_dict)
+def get_info(f: tarfile.TarInfo) -> str:
+    return f'{f.name} {f.size} {typename(f.type)}'
 
-    for c in net.cables:
-        c_dict = {'name': c.name,
-                  'A': c.A.name,
-                  'port_A': c.port_A,
-                  'B': c.B.name,
-                  'port_B': c.port_B}
-        list_cable.append(c_dict)
+def typename(ftype):
+    ftypes={tarfile.REGTYPE: 'REGTYPE', tarfile.AREGTYPE: 'AREGTYPE', 
+            tarfile.LNKTYPE: 'LNKTYPE', tarfile.SYMTYPE: 'SYMTYPE', 
+            tarfile.DIRTYPE: 'DIRTYPE', tarfile.FIFOTYPE: 'FIFOTYPE', 
+            tarfile.CONTTYPE: 'CONTTYPE', tarfile.CHRTYPE: 'CHRTYPE', 
+            tarfile.BLKTYPE: 'BLKTYPE', tarfile.GNUTYPE_SPARSE: 'GNUTYPE_SPARSE'}
+    return ftypes[ftype]
 
-    network_dict = {'network_name': net.name,
-                    'host_list': list_host,
-                    'switch_list': list_switch,
-                    'cable_list': list_cable}
+def filter_cow(f: tarfile.TarInfo) ->tarfile.TarInfo:
+    f.type = tarfile.GNUTYPE_SPARSE
+    #print(f.name, f.size, typename(f.type))
+    return f
 
-    f_name = net.name + '.json'
-    with open(f_name, 'w') as f:
-        json.dump(network_dict, f, indent=3)
-    f.close()
-
-    os.system('mv ' + f_name + ' /tmp/')
-
-    file_cow = ''
-    if configuration is True:
-        file_cow = '/tmp/' + net.name + '*.cow'
-
-    os.system('tar -cSzvf ' + path + '/arc_' + net.name + '_SimNet.tgz -P ' + file_cow +
-              ' /tmp/' + f_name + ' --atime-preserve')
 
 
 def load(arc_file_path):
