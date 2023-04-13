@@ -65,12 +65,13 @@ class Host(Component):
         if os.path.exists(cow) and (os.path.getmtime(fs) > os.path.getmtime(cow)):
             self.log(logging.WARNING, f'backing file {fs} is newer than cow {cow}')
             os.remove(cow)
-    
+
     def wait_ready(self):
         self.log(logging.DEBUG, 'entering call to wait_ready')
         data = self.ready_sock.recv(1024)
-        #self.console=data[16:].decode('utf-8')
-        #print (self.console)
+        #hex_dump(data)
+        #self.console=data[16:-1].decode('ascii')
+        #print(self.console)
         self.ready=True
         time.sleep(1)
         for c in self.command_queue:
@@ -95,7 +96,7 @@ class Host(Component):
 
     def command(self, command):
         if not self.ready:
-            if not command.startswith('version'):
+            if not command.startswith(self.console_signals['check']):
                 self.log(logging.DEBUG, f'queueing command {command}')
             self.command_queue.append(command)
             return None
@@ -104,6 +105,14 @@ class Host(Component):
             rv=True
         self.log_command(command, rv)
         return rv
+    
+    def stop(self):
+        os.remove(self.ready_socket_name)
 
     def connect_to_switch(self, host_port, component, switch_port):
         self.command(f'config eth{host_port}=vde,{netcircus_paths.WORKAREA}/{component},{Host.get_mac()},{switch_port}')
+
+
+def hex_dump(data):
+    for i in range(len(data)):
+        print(i, data[i], chr(data[i]))
