@@ -23,9 +23,9 @@ class Cable:
     def init_from_dump(self, dump, network):
         self.name = dump['name']
         self.type = dump['type']
-        self.A = dump['endpoint_A'] # FIXME: must retrieve object from ntwork!
+        self.A = network.get_element_by_name(dump['endpoint_A'])
         self.port_A = dump['port_A']
-        self.B = dump['endpoint_B'] # FIXME: must retrieve object from ntwork!
+        self.B = network.get_element_by_name(dump['endpoint_B'])
         self.port_B = dump['port_B']
 
     def init_from_parameters(self, name, endpoint_A, port_A, endpoint_B, port_B):

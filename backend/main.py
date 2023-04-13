@@ -6,8 +6,6 @@ from host import Host
 from switch import Switch
 from network import Network
 from cable import Cable
-# from controller import Controller
-
 
 def check_string(s):
     invalid_chars = set(string.punctuation.replace("_", ""))
@@ -30,25 +28,26 @@ def simple_main():
     Cable(network, 'cable1', host1, 0, switch1, 1)
     Cable(network, 'cable2', host2, 0, switch1, 2)
 
-    #ctrl = Controller(network)
     network.start_up()
-    print('Network is up')
-    #ctrl.start()
+    #print('Network is up')
     #print('End of ctrl()')
     time.sleep(30)
     #print(json.dumps(network.dump(), indent=2))
-    #ctrl.set_active(False)
-    time.sleep(1)
+    #time.sleep(1)
     network.shutdown()
     # FIXME: must wait for proper sutdown before saving.
     time.sleep(10)
-    print('saving network')
+    #print('saving network')
     network.save()
+
+def restore():
     print('restoring network')
     n2=Network(tar_name=f'{netcircus_paths.SAVE_PATH}/test.tgz')
-    print('End of main()')
-
-
+    n2.start_up()
+    time.sleep(20)
+    n2.shutdown()
+ 
 if __name__ == '__main__':
     check_paths()
-    simple_main()
+    #simple_main()
+    restore()

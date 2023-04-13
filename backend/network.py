@@ -7,6 +7,7 @@ import threading
 import time
 import json
 import tarfile
+import logging
 
 class Network:
     def __init__(self, name=None, tar_name=None):
@@ -15,10 +16,12 @@ class Network:
         self.hosts = []
         self.switches = []
         self.cables = []
+        self.objects={}
         if tar_name is not None:
             self.load(tar_name)
 
     def add(self, obj):
+        self.objects[obj.name]=obj
         if type(obj) == Host:
             self.hosts.append(obj)
             return
@@ -28,6 +31,10 @@ class Network:
         if type(obj) == Cable:
             self.cables.append(obj)
             return
+
+    def get_element_by_name(self, n):
+        if n in self.objects.keys():
+            return self.objects[n]
 
     def start_up(self):
         for c in self.hosts + self.switches:
@@ -48,13 +55,13 @@ class Network:
     def shutdown(self):
         for c in self.hosts + self.switches:
             if c.check():
-                print('Shutting down ' + c.name)
+                #print('Shutting down ' + c.name)
                 c.shutdown()
 
     def poweroff(self):
         for c in self.hosts + self.switches:
             if c.check:
-                print('Force shutdown for ' + c.name)
+                #print('Force shutdown for ' + c.name)
                 c.halt()
 
 
@@ -70,10 +77,14 @@ class Network:
             tar_name = f'{netcircus_paths.SAVE_PATH}/{self.name}.tgz'
         with open(self.conf_name, 'w') as f:
             json.dump(self.dump(), f, indent=2)
-        with tarfile.open(tar_name, 'w:gz', format=tarfile.GNU_FORMAT) as tar:
-            tar.add(self.conf_name, arcname=os.path.basename(self.conf_name))
-            for f in [h.cow for h in self.hosts]:
-                tar.add(f, arcname=os.path.basename(f), filter=filter_cow)
+        # Not working: Sparse file support in libtar is read-only.
+        #with tarfile.open(tar_name, 'w:gz', format=tarfile.GNU_FORMAT) as tar:
+        #    tar.add(self.conf_name, arcname=os.path.basename(self.conf_name))
+        #    for f in [h.cow for h in self.hosts]:
+        #        tar.add(f, arcname=os.path.basename(f), filter=filter_cow)
+        filenames = [os.path.basename(self.conf_name)] + [os.path.basename(h.cow) for h in self.hosts]
+
+        os.system('cd %s; tar cSzf %s %s' % (netcircus_paths.WORKAREA, tar_name, ' '.join(filenames)))
         # clean files
         os.remove(self.conf_name)
         for f in [h.cow for h in self.hosts]:
@@ -85,20 +96,21 @@ class Network:
             self.name=conf['network_name']
             # hosts
             for h in conf['hosts']:
-                self.add(Host(self, dump=h))
+                Host(self, dump=h)
             # switches
             for s in conf['switches']:
-                self.add(Switch(self, dump=s))
+                Switch(self, dump=s)
             # cables
             for c in conf['cables']:
-                self.add(Cable(self, dump=c))
+                Cable(self, dump=c)
 
     def load(self, tar_name):
         with tarfile.open(tar_name, 'r:gz') as tar:
             # restore_config
             tar.extract(os.path.basename(self.conf_name), path=netcircus_paths.WORKAREA)
             for f in tar.getmembers():
-                print(get_info(f))
+                if f.name.endswith('.cow'):
+                    tar.extract(f, path=netcircus_paths.WORKAREA)
         # load config
         self.load_config()
             
@@ -118,29 +130,3 @@ def filter_cow(f: tarfile.TarInfo) ->tarfile.TarInfo:
     f.type = tarfile.GNUTYPE_SPARSE
     #print(f.name, f.size, typename(f.type))
     return f
-
-
-
-def load(arc_file_path):
-    """
-
-    :type arc_file_path: String
-    :rtype: Network
-    """
-
-    print('arc_file path: ' + arc_file_path)
-    arc_name = arc_file_path.split('/')
-    arc_name = arc_name[-1]
-    print('arc_name: ' + arc_name)
-    path = arc_file_path[:-len(arc_name)]
-    print('path: ' + path)
-
-    # os.makedirs(path + '/bho')
-
-    com = 'tar -P -xvzf ' + arc_file_path + ' -C ' + path
-    print(com)
-    os.system(com)
-
-    # with open(arc_file_path, 'r') as f:
-      #  data = json.load(f)
-    return
