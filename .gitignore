@@ -10,3 +10,4 @@ image/marionnet_rclocal.sh
 *.cow
 *.log
 work/*
+env/*

@@ -29,11 +29,12 @@ class NcCanvas(Gtk.DrawingArea):
     def draw_component(self, cx: cairo.Context, c: ComponentModel):
         #print(f'drawing component @({c.x}, {c.y}, w={self.icons[c.type].get_width()}, h={self.icons[c.type].get_height()}), type={c.type}')
         print(self.icons[c.type])
-        #cx.set_source(cairo.SurfacePattern(self.icons[c.type]))
-        cx.set_source_rgb(*self.colors[c.type])
-        cx.rectangle(c.x, c.y, c.width, c.height)
-        cx.fill_preserve()
-        cx.stroke()
+        cx.set_source_surface(self.icons[c.type], c.x, c.y)
+        cx.paint()
+        #cx.set_source_rgb(*self.colors[c.type])
+        #cx.rectangle(c.x, c.y, c.width, c.height)
+        #cx.fill_preserve()
+        #cx.stroke()
 
     @Gtk.Template.Callback()
     def on_draw(self, widget, cx):
