@@ -15,14 +15,8 @@ class NcCanvas(Gtk.DrawingArea):
         super().__init__()
         self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png('host.png'),
                     ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png('switch.png')}
-        self.colors={ComponentModel.TYPE_HOST: (1,0,0),
-                    ComponentModel.TYPE_SWITCH: (0,1,0)}
         self.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
         self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK) 
-        #self.connect('drag-data-received', self.on_drag_data_received)
-        #self.connect('draw', self.on_draw)
-        #self.connect('button-press-event', self.on_button_press)
-        #self.connect('button-release-event', self.on_button_release)
         self.network_model=NetworkModel()
         self.current_component=None
 
@@ -31,10 +25,6 @@ class NcCanvas(Gtk.DrawingArea):
         print(self.icons[c.type])
         cx.set_source_surface(self.icons[c.type], c.x, c.y)
         cx.paint()
-        #cx.set_source_rgb(*self.colors[c.type])
-        #cx.rectangle(c.x, c.y, c.width, c.height)
-        #cx.fill_preserve()
-        #cx.stroke()
 
     @Gtk.Template.Callback()
     def on_draw(self, widget, cx):
