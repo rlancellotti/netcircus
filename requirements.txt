@@ -1,0 +1,2 @@
+pygobject > 3.0.3
+pycairo

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.40.0 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <template class="NcCanvas" parent="GtkDrawingArea">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <signal name="drag-data-received" handler="on_drag_data_received" swapped="no"/>
+    <signal name="draw" handler="on_draw" swapped="no"/>
+    <signal name="button-press-event" handler="on_button_press" swapped="no"/>
+    <signal name="button-release-event" handler="on_button_release" swapped="no"/>
+  </template>
+</interface>
