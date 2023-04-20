@@ -2,7 +2,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gui.nc_palette import NcPalette
+from nc_palette import NcPalette
 from nc_canvas import NcCanvas
 
 
