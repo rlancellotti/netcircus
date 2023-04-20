@@ -2,12 +2,12 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from nc_palette import NcPalette
+from nc_palette2 import NcPalette
 from nc_canvas import NcCanvas
 
 (TARGET_ENTRY_TEXT, TARGET_ENTRY_PIXBUF) = range(2)
 
-#@Gtk.Template(resource_path="netcircus.ui")
+#@Gtk.Template(filename="netcircus.ui")
 class NcMainWnd(Gtk.Window):
     __gtype_name__ = "NcMainWnd"
     def __init__(self):
@@ -21,17 +21,11 @@ class NcMainWnd(Gtk.Window):
 
         self.palette = NcPalette()
         self.canvas = NcCanvas()
+        self.palette.set_canvas(self.canvas)
 
         hbox.pack_start(self.palette, True, True, 0)
         hbox.pack_start(self.canvas, True, True, 0)
-        self.add_text_targets()
-
-    def add_image_targets(self):
-        targets = Gtk.TargetList.new([])
-        targets.add_text_targets(TARGET_ENTRY_PIXBUF, True)
-
-        self.canvas.drag_dest_set_target_list(targets)
-        self.palette.drag_source_set_target_list(targets)
+        #self.add_text_targets()
 
     def add_text_targets(self):
         #self.canvas.drag_dest_set_target_list(None)
