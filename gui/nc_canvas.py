@@ -2,7 +2,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
-from component import ComponentModel, NetworkModel
+from component import ComponentModel, LinkModel, NetworkModel
 import cairo
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
@@ -15,9 +15,11 @@ class NcCanvas(Gtk.DrawingArea):
         self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png('host.png'),
                     ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png('switch.png')}
         #self.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK) 
+        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON1_MOTION_MASK) 
         self.network_model=NetworkModel()
         self.current_component=None
+        self.current_link_start=None
+        self.current_link_end=None
         self.action=None
 
     def set_action(self, action):
@@ -25,14 +27,43 @@ class NcCanvas(Gtk.DrawingArea):
 
     def draw_component(self, cx: cairo.Context, c: ComponentModel):
         #print(f'drawing component @({c.x}, {c.y}, w={self.icons[c.type].get_width()}, h={self.icons[c.type].get_height()}), type={c.type}')
-        print(self.icons[c.type])
+        #print(self.icons[c.type])
         cx.set_source_surface(self.icons[c.type], c.x, c.y)
         cx.paint()
+
+    def draw_link(self, cx: cairo.Context, l: LinkModel):
+        #print(f'drawing component @({c.x}, {c.y}, w={self.icons[c.type].get_width()}, h={self.icons[c.type].get_height()}), type={c.type}')
+        cx.set_source_rgb(0, 0, 0)
+        cx.move_to(*icon_center(l.a))
+        cx.line_to(*icon_center(l.b))
+        cx.stroke()
+    
+    def draw_dangling_link(self, cx: cairo.Context):
+        print('call to draw_dangling_link')
+        if self.current_link_start is not None and self.current_link_end is not None:
+            print(f'drawing danging link from {icon_center(self.network_model.get_component(self.current_link_start))} to {self.current_link_end}')
+            cx.set_source_rgb(1, 0, 0)
+            cx.move_to(*icon_center(self.network_model.get_component(self.current_link_start)))
+            cx.line_to(*self.current_link_end)
+            cx.stroke()
+
+    @Gtk.Template.Callback()
+    def on_motion_notify_event(self, widget, event):
+        if self.current_component is not None:
+            print('motion: updating component pos')
+            self.update_current_component_pos(event.x, event.y)
+        if self.current_link_start is not None:
+            print('motion: updating dangling link')
+            self.current_link_end=(event.x, event.y)
+            self.queue_draw()
+
 
     @Gtk.Template.Callback()
     def on_draw(self, widget, cx):
         #print(f'call to draw method widget: {widget}, cairo context: {cr}')
-        #cx.set_source_rgb(1, 1, 0)
+        self.draw_dangling_link(cx)
+        for l in self.network_model.get_links():
+            self.draw_link(cx, l)
         for c in self.network_model.get_components():
             self.draw_component(cx, c)
 
@@ -48,33 +79,47 @@ class NcCanvas(Gtk.DrawingArea):
             h=self.icons[comp_type].get_height()
             self.network_model.add_component(comp_type, *icon_coords_from_center(x, y, w, h), w, h)
             self.queue_draw()
-
+    
     @Gtk.Template.Callback()
     def on_button_press(self, widget, event):
-        if self.action==ACTION_MOVE:
-            self.current_component=self.network_model.get_component_from_cords(event.x, event.y)
-            if event.button == 1:
-                print(f'press @({event.x}, {event.y}) -> {self.current_component}')
-        if self.action==ACTION_HOST:
-            self.add_component(ComponentModel.TYPE_HOST, event.x, event.y)
-        if self.action==ACTION_SWITCH:
-            self.add_component(ComponentModel.TYPE_SWITCH, event.x, event.y)
+        if event.button == 1:
+            if self.action==ACTION_MOVE:
+                self.current_component=self.network_model.get_component_from_cords(event.x, event.y)
+            if self.action==ACTION_CONNECT:
+                self.current_link_start=self.network_model.get_component_from_cords(event.x, event.y)
+                print(f'connect from @({event.x}, {event.y}) -> {self.current_link_start}')
+            if self.action==ACTION_HOST:
+                self.add_component(ComponentModel.TYPE_HOST, event.x, event.y)
+            if self.action==ACTION_SWITCH:
+                self.add_component(ComponentModel.TYPE_SWITCH, event.x, event.y)
 
-
-        if event.button == 3 and self.current_component is not None:
+        if event.button == 3:
             print(f'open context menu for component {self.current_component}')
+
+    def update_current_component_pos(self, x, y):
+        if self.current_component is not None and self.action==ACTION_MOVE:
+            c=self.network_model.get_component(self.current_component)
+            (c.x, c.y)=icon_coords_from_center(x, y, c.width, c.height)
+            self.queue_draw()
 
     @Gtk.Template.Callback()
     def on_button_release(self, widget, event):
         if self.current_component is not None and self.action==ACTION_MOVE:
-            c=self.network_model.get_component(self.current_component)
-            (c.x, c.y)=icon_coords_from_center(event.x, event.y, c.width, c.height)
-            print(f'must move component {self.current_component}')
-            self.queue_draw()
+            self.update_current_component_pos(event.x, event.y)
+            self.current_component=None
+        if self.current_link_start is not None and self.action==ACTION_CONNECT:
+            cb=self.network_model.get_component_from_cords(event.x, event.y)
+            if cb is not None:
+                self.network_model.add_link(self.current_link_start, cb)
+                self.current_link_start=None
+                self.current_link_end=None
+                self.queue_draw()
 
 def icon_coords_from_center(x, y, w, h):
     return (x-w/2, y-h/2)
 
+def icon_center(c: ComponentModel):
+    return (c.x+c.width/2, c.y+c.height/2)
 
 if __name__ == '__main__':
     window = Gtk.Window()

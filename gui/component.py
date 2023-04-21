@@ -1,7 +1,6 @@
 class ComponentModel():
     TYPE_HOST = 'Host'
     TYPE_SWITCH = 'Switch'
-    TYPE_CABLE = 'Cable'
     TYPE_UNKNOWN = ''
     next_id=0
     def __init__(self, type, x, y, width, height):
@@ -13,15 +12,45 @@ class ComponentModel():
         self.y = y
         self.width = width
         self.height = height
+        self.free_conect=0
+    def new_connection(self):
+        rv=self.free_conect
+        self.free_conect += 1
+        return rv
+
+class LinkModel():
+    next_id=0
+    def __init__(self, a, b):
+        self.id=LinkModel.next_id
+        LinkModel.next_id += 1
+        self.a=a
+        self.a_port=a.new_connection()
+        self.b=b
+        self.b_port=b.new_connection()
 
 class NetworkModel():
     def __init__(self):
         self.components={}
+        self.links={}
 
     def add_component(self, type, x, y, width, height):
         print(f'adding component @({x},{y})')
         c=ComponentModel(type, x, y, width, height)
         self.components[c.id]=c
+    
+    def add_link(self, a, b):
+        if type(a) == int:
+            a=self.get_component(a)
+        if type(b) == int:
+            b=self.get_component(b)
+        l=LinkModel(a, b)
+        self.links[l.id]=l
+
+    def get_links(self):
+        return list(self.links.values())
+    
+    def get_link(self, id):
+        return self.links[id] if id in self.links.keys() else None
 
     def get_components(self):
         return list(self.components.values())
