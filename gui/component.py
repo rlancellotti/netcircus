@@ -46,6 +46,14 @@ class NetworkModel():
         l=LinkModel(a, b)
         self.links[l.id]=l
 
+    def delete_component(self, c):
+        if type(c) == int:
+            c=self.get_component(c)
+        del(self.components[c.id])
+        for l in self.get_links():
+            if l.a==c or l.b == c:
+                del self.links[l.id]
+
     def get_links(self):
         return list(self.links.values())
     
