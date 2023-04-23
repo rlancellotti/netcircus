@@ -87,7 +87,7 @@ class NcCanvas(Gtk.DrawingArea):
                 self.selected_component=self.network_model.get_component_from_cords(event.x, event.y)
             if self.action==ACTION_CONNECT:
                 self.current_link_start=self.network_model.get_component_from_cords(event.x, event.y)
-                print(f'connect from @({event.x}, {event.y}) -> {self.current_link_start}')
+                #print(f'connect from @({event.x}, {event.y}) -> {self.current_link_start}')
             if self.action==ACTION_HOST:
                 self.add_component(ComponentModel.TYPE_HOST, event.x, event.y)
                 self.selected_component=self.network_model.get_component_from_cords(event.x, event.y)
@@ -97,7 +97,7 @@ class NcCanvas(Gtk.DrawingArea):
         if event.button == 3:
             #self.build_context_menu()
             self.selected_component=self.network_model.get_component_from_cords(event.x, event.y)
-            print(f'pressedd button3: selected component is: {self.selected_component}')
+            #print(f'pressedd button3: selected component is: {self.selected_component}')
             self.cmenu.popup_at_pointer()
         self.queue_draw()
 

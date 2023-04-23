@@ -9,8 +9,12 @@ import json
 import tarfile
 import logging
 
+ELEMENT_HOST = 1 
+ELEMENT_SWITCH = 2 
+ELEMENT_CABLE = 4
+
 class Network:
-    def __init__(self, name=None, tar_name=None):
+    def __init__(self, name='', tar_name=None):
         self.conf_name = f'{netcircus_paths.WORKAREA}/config.json'
         self.name = name
         self.hosts = []
@@ -20,8 +24,24 @@ class Network:
         if tar_name is not None:
             self.load(tar_name)
 
+    def set_name(self, name):
+        self.name=name
+
+    def get_name(self):
+        return self.name
+
+    def get_elements(self, element_type_mask):
+        rv = []
+        if element_type_mask & ELEMENT_HOST:
+            rv += [e.name for e in self.hosts]
+        if element_type_mask & ELEMENT_SWITCH:
+            rv += [e.name for e in self.switches]
+        if element_type_mask & ELEMENT_CABLE:
+            rv += [e.name for e in self.links]
+        return rv
+
     def add(self, obj):
-        self.objects[obj.name]=obj
+        self.objects[obj.id]=obj
         if type(obj) == Host:
             self.hosts.append(obj)
             return
@@ -32,9 +52,26 @@ class Network:
             self.cables.append(obj)
             return
 
-    def get_element_by_name(self, n):
+    def get_element_by_id(self, n):
         if n in self.objects.keys():
             return self.objects[n]
+        else: return None
+
+    def delete_element(self, id):
+        obj = self.get_element_by_id(id)
+        if obj is not None:
+            del(self.objects[obj.id])
+            if type(obj) == Cable:
+                self.cables.remove(obj)
+            for c in self.cables:
+                if c.a == obj or c.b == obj:
+                    self.cables.remove(c)
+            if type(obj) == Host:
+                self.hosts.remove(obj)
+                return
+            if type(obj) == Switch:
+                self.switches.remove(obj)
+                return
 
     def start_up(self):
         for c in self.hosts + self.switches:

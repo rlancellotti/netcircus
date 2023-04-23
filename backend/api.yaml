@@ -1,0 +1,210 @@
+swagger: "2.0"
+info:
+  version: "1.0"
+  title: "Net Circus"
+  description: "API for Net Circus backed access"
+host: "unix_socket_name"
+basePath: "/api/vi"
+paths:
+  /system/kernels:
+    get:
+      description: "Get list of kernels"
+      operationId: "GetKernels"
+      responses:
+        200:
+          description: "Returns list of kernels"
+          schema:
+            $ref: "#/definitions/ComponentList"
+  /system/filesystems:
+    get:
+      description: "Get list of filesystems"
+      operationId: "GetFilesystems"
+      responses:
+        200:
+          description: "Returns list of filesystems"
+          schema:
+            $ref: "#/definitions/ComponentList"
+  /system/networkname:
+    get:
+      description: "Get network name"
+      operationId: "GetNetworkName"
+      responses:
+        200:
+          description: "Returns Name of Network"
+          schema:
+            type: object
+            properties:
+              name: {type: string, example: "example1"}
+    post:
+      description: "Set network name"
+      operationId: "SetNetworkName"
+      consumes: [application/json]
+      responses:
+        201:
+          description: "Set Name of Network"
+          schema:
+            type: object
+            properties:
+              name: {type: string, example: "example1"}
+        400: {description: "Generic error"}
+  /host:
+    get:
+      description: "Get list of hosts"
+      operationId: "GetHosts"
+      responses:
+        200:
+          description: "Returns list of hosts"
+          schema:
+            $ref: "#/definitions/ComponentList"
+  /host/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: "id of the host"
+        type: string
+    get:
+      description: "Get host description"
+      operationId: "GetHost"
+      responses:
+        200:
+          description: "Host description"
+          schema: {$ref: "#/definitions/Host"}
+        404: {description: "Not found"}
+    post:
+      description: "Update/add host description"
+      operationId: "PostHost"
+      consumes: [application/json]
+      responses:
+        201:
+          description: "Host description"
+          schema: {$ref: "#/definitions/Host"}
+        400: {description: "Generic error"}
+    delete:
+      description: "Delete host"
+      operationId: "DeleteHost"
+      responses:
+        201: {description: "Deleted"}
+        404: {description: "Not found"}
+  /switch:
+    get:
+      description: "Get list of switches"
+      operationId: "GetSwitches"
+      responses:
+        200:
+          description: "Returns list of switches"
+          schema:
+            $ref: "#/definitions/ComponentList"
+  /switch/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: "id of the switch"
+        type: string
+    get:
+      description: "Get switch description"
+      operationId: "GetSwitch"
+      responses:
+        200:
+          description: "Switch description"
+          schema: {$ref: "#/definitions/Switch"}
+        404: {description: "Not found"}
+    post:
+      description: "Update/add host description"
+      operationId: "PostSwitch"
+      consumes: [application/json]
+      responses:
+        201:
+          description: "Switch description"
+          schema: {$ref: "#/definitions/Switch"}
+        400: {description: "Generic error"}
+    delete:
+      description: "Delete switch"
+      operationId: "DeleteSwitch"
+      responses:
+        201: {description: "Deleted"}
+        404: {description: "Not found"}
+  /link:
+    get:
+      description: "Get list of links"
+      operationId: "GetLinks"
+      responses:
+        200:
+          description: ""
+          schema:
+            $ref: "#/definitions/ComponentList"
+  /link/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: "id of the link"
+        type: string
+    get:
+      description: "Get link description"
+      operationId: "GetLink"
+      responses:
+        200:
+          description: "Link description"
+          schema: {$ref: "#/definitions/Link"}
+        404: {description: "Not found"}
+    post:
+      description: "Update/add link description"
+      operationId: "PostLink"
+      consumes: [application/json]
+      responses:
+        201:
+          description: "Link description"
+          schema: {$ref: "#/definitions/Link"}
+        400: {description: "Generic error"}
+    delete:
+      description: "Delete link"
+      operationId: "DeleteLink"
+      responses:
+        201: {description: "Deleted"}
+        404: {description: "Not found"}
+
+definitions:
+  ComponentList:
+    type: array
+    items:
+      type: string
+    example: ["host1", "host2"]
+  Host:
+    type: object
+    required: [id]
+    properties:
+      id: {type: string, example: "h1"}
+      name: {type: string, example: "client_host"}
+      description: {type: string, example: "The client"}
+      mem: {type: integer, example: "96"}
+      kernel: {type: string, example: "/usr/bin/linux.uml"}
+      filesystem: {type: string, example: "rootfs.ext"}
+      cow: {type: string, example: "h1.cow"}
+      x: {type: number, example: "1.0"}
+      y: {type: number, example: "1.0"}
+      width: {type: number, example: "1.0"}
+      height: {type: number, example: "1.0"}
+  Switch:
+    type: object
+    required: [id]
+    properties:
+      id: {type: string, example: "s1"}
+      name: {type: string, example: "switch1"}
+      description: {type: string, example: "The switch"}
+      x: {type: number, example: "1.0"}
+      y: {type: number, example: "1.0"}
+      width: {type: number, example: "1.0"}
+      height: {type: number, example: "1.0"}
+  Link:
+    type: object
+    required: [name, id_a, port_a, id_b, port_b]
+    properties:
+      id: {type: string, example: "l1"}
+      name: {type: string, example: "straight_cable1"}
+      id_a: {type: string, example: "host1"}
+      port_a: {type: integer, example: "1"}
+      id_b: {type: string, example: "switch1"}
+      port_b: {type: integer, example: "1"}
+

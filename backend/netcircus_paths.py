@@ -9,3 +9,9 @@ FS1 = FS_PATH + '/root.ext4'
 KER1 = "/usr/bin/linux"
 KER2 = KERNEL_PATH + '/linux-3.18.20-mod'
 KER3 = KERNEL_PATH + '/linux-4.10-mod'
+
+def get_kernels():
+    return [KER1, KER2, KER3]
+
+def get_filesystems():
+    return [FS1]
