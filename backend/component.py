@@ -11,18 +11,18 @@ class Component:
     Status_Names={1: 'RUNNING', 2: 'STARTING', 0: 'STOPPED'}
     check_interval=1
 
-    def __init__(self, name):
+    def __init__(self, id):
         logging.basicConfig(filename='test.log', level=logging.DEBUG)
-        self.logger=logging.getLogger(name)
+        self.logger=logging.getLogger(id)
         self.status=Component.Status_Stopped
-        self.name = name
-        self.label = None
+        self.name = id
+        self.description = None
         self.console = None
         self.console_signals = {'stop': None,
                                 'halt': None,
                                 'check': None}
         self.cmdline = None
-        self.start_check()
+        #self.start_check()
 
     def start_check(self):
         self.log(logging.DEBUG, 'call to start_check')
@@ -44,6 +44,7 @@ class Component:
         os.system(f'x-terminal-emulator -T {self.name} -e \"{self.cmdline}\"')
         self.status=Component.Status_Starting
         self.log(logging.INFO, 'Starting')
+        self.start_check()
 
     def command(self, command):
         pass

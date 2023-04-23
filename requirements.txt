@@ -1,2 +1,4 @@
 pygobject > 3.0.3
 pycairo
+flask
+flask_restful

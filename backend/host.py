@@ -14,13 +14,20 @@ class Host(Component):
         Host.mac_counter += 1
         return  '%s:%02x:%02x:%02x' % (Host.mac_prefix, Host.mac_counter // (256*256), Host.mac_counter // 256, Host.mac_counter % 256)
 
-    def __init__(self, network, name=None, label=None, mem=96, dump=None):
-        super().__init__(name if name is not None else dump['name'])
+    def __init__(self, network, data):
+        super().__init__(data['id'])
         self.network=network
-        if dump is None:
-            self.init_from_parameters(network, name, label, mem)
-        else:
-            self.init_from_dump(dump)
+        self.id=data['id'] 
+        self.name = data['name'] if 'name' in data.keys() else 'unnamed'
+        self.description = data['description'] if 'description' in data.keys() else ''
+        self.kernel = data['kernel'] if 'kernel' in data.keys() else netcircus_paths.get_kernels()[0]
+        self.fs = data['filesystem'] if 'filesystem' in data.keys() else netcircus_paths.get_filesystems()[0]
+        self.cow = data['cow'] if 'cow' in data.keys() else f'{netcircus_paths.WORKAREA}/{self.id}.cow'
+        self.mem = '%dM' % data['mem'] if 'mem' in data.keys() else '96M'
+        self.x = data['x' ] if 'mem' in data.keys() else '0.0'
+        self.y = data['y' ] if 'mem' in data.keys() else '0.0'
+        self.width = data['width' ] if 'mem' in data.keys() else '0.0'
+        self.height = data['height' ] if 'mem' in data.keys() else '0.0'
         self.check_cow(self.cow, self.fs)
         self.ready=False
         self.console = self.name + '_cmd'
@@ -34,31 +41,31 @@ class Host(Component):
         self.log(logging.DEBUG, self.cmdline)
         self.network.add(self)
 
-    def init_from_dump(self, dump):
-        self.name = dump['name']
-        self.label = dump['label']
-        self.kernel = dump['kernel']
-        self.fs = dump['filesystem']
-        self.cow = dump['cow']
-        self.mem = dump['mem']
-
-    def init_from_parameters(self, network, name, label, mem):
-        self.network = network
-        self.name = name
-        self.label = label
-        self.kernel = netcircus_paths.KER1
-        self.fs = netcircus_paths.FS1
-        self.cow=f'{netcircus_paths.WORKAREA}/{self.name}_0.cow'
-        self.mem = mem
+    def update(self, data):
+        if 'name' in data.keys(): self.name=data['name']
+        if 'description' in data.keys(): self.description=data['description']
+        if 'mem' in data.keys(): self.mem='%dM' % data['mem'] 
+        if 'kernel' in data.keys(): self.kernel=data['kernel']
+        if 'filesystem' in data.keys(): self.filesystem=data['filesystem']
+        if 'cow' in data.keys(): self.cow=data['cow']
+        if 'x' in data.keys(): self.x=data['x']
+        if 'y' in data.keys(): self.y=data['y']
+        if 'width' in data.keys(): self.width=data['width']
+        if 'height' in data.keys(): self.height=data['height']
 
     def dump(self) -> dict:
         rv={}
+        rv['id']=self.id
         rv['name']=self.name
-        rv['label']=self.label
+        rv['description']=self.description
         rv['kernel']=self.kernel
         rv['filesystem']=self.fs
         rv['cow']=self.cow
         rv['mem']=self.mem
+        rv['x']=self.x
+        rv['y']=self.y
+        rv['width']=self.width
+        rv['height']=self.height
         return rv
 
     def check_cow(self, cow, fs):
