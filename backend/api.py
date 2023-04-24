@@ -10,24 +10,26 @@ basePath = '/api/v1'
 
 net=network.Network()
 
-class KernelResource(Resource):
-    def get(self):
-        return netcircus_paths.get_kernels()
-
-class FilesystemResource(Resource):
-    def get(self):
-        return netcircus_paths.get_filesystems()
-
-class NetworkResource(Resource):
-    def get(self):
-        return net.get_name()
-    def post(self):
+class SystemResource(Resource):
+    def get(self, res):
+        if res == 'kernels':
+            return netcircus_paths.get_kernels(), 200
+        if res == 'filesystems':
+            return netcircus_paths.get_filesystems(), 200
+        if res == 'networkname':
+            return net.get_name(), 200
+        return None, 404
+    def post(self, res):
         n=request.json
-        # FIXME: must add stronger validation
-        if 'name' in n.keys():
-            net.set_name(n['name'])
-            return net.get_name(), 201
-        else: return None, 400
+        if res in ['kernels', 'filesystems']:
+            return None, 405
+        if res == 'networkname':
+            # FIXME: must add stronger validation
+            if 'name' in n.keys():
+                net.set_name(n['name'])
+                return net.get_name(), 201
+            else: return None, 400
+        return None, 404
 
 class HostList(Resource):
     def get(self):
@@ -55,9 +57,25 @@ class HostResource(Resource):
             return None, 201
         else: return None, 404
 
-api.add_resource(KernelResource, f'{basePath}/system/kernels')
-api.add_resource(FilesystemResource, f'{basePath}/system/filesystems')
-api.add_resource(NetworkResource, f'{basePath}/system/networkname')
+class ActionResource(Resource):
+    def post(self, action):
+        if action == 'start':
+            net.start_up()
+            return None, 200
+        if action == 'stop':
+            net.shutdown()
+            return None, 200
+        if action == 'halt':
+            net.poweroff()
+            return None, 200
+        if action == 'save':
+            # FIXME: can use filename from request body
+            net.save()
+            return None, 200
+        # FIXME: must implement 'load' action
+
+api.add_resource(SystemResource, f'{basePath}/system/<string:res>')
+api.add_resource(ActionResource, f'{basePath}/action/<string:action>')
 api.add_resource(HostList, f'{basePath}/host')
 api.add_resource(HostResource, f'{basePath}/host/<string:id>')
 

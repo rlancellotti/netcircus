@@ -14,6 +14,14 @@ GET http://localhost:8080/api/v1/host/h1
 echo -n '{"id":"h1"}' | POST -c "application/json" 'http://localhost:8080/api/v1/host/h1'
 GET http://localhost:8080/api/v1/host
 GET http://localhost:8080/api/v1/host/h1
+
+echo "*** Delete host and get list of hosts ***"
 lwp-request -m DELETE http://localhost:8080/api/v1/host/h1
 GET http://localhost:8080/api/v1/host/h1
+GET http://localhost:8080/api/v1/host
 
+echo create and run host
+echo -n '{"id":"h1"}' | POST -c "application/json" 'http://localhost:8080/api/v1/host/h1'
+echo -n '{}' |POST -c "application/json" 'http://localhost:8080/api/v1/action/start'
+sleep 20
+echo -n '{}' |POST -c "application/json" 'http://localhost:8080/api/v1/action/stop'
