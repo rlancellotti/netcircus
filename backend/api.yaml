@@ -6,22 +6,19 @@ info:
 host: "unix_socket_name"
 basePath: "/api/vi"
 paths:
-  /system/kernels:
+  /system/{resource}:
+    parameters:
+      - name: resource
+        in: path
+        required: true
+        description: "Name of the resource. Can be: kernels, filesystems"
+        type: string
     get:
-      description: "Get list of kernels"
-      operationId: "GetKernels"
+      description: "Get list of resource"
+      operationId: "GetResources"
       responses:
         200:
-          description: "Returns list of kernels"
-          schema:
-            $ref: "#/definitions/ComponentList"
-  /system/filesystems:
-    get:
-      description: "Get list of filesystems"
-      operationId: "GetFilesystems"
-      responses:
-        200:
-          description: "Returns list of filesystems"
+          description: "Returns list of resource"
           schema:
             $ref: "#/definitions/ComponentList"
   /system/networkname:
@@ -47,6 +44,20 @@ paths:
             properties:
               name: {type: string, example: "example1"}
         400: {description: "Generic error"}
+  /action/{actionname}:
+    parameters:
+      - name: actionname
+        in: path
+        required: true
+        description: "Name of the action. Can be: start, stop, halt, save, load"
+        type: string
+    post:
+      description: "Perform action"
+      operationId: "PerformAction"
+      consumes: [application/json]
+      responses:
+        200: {description: "Success"}
+        400: {description: "Error"}
   /host:
     get:
       description: "Get list of hosts"
