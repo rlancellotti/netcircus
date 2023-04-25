@@ -117,3 +117,9 @@ class BackendBridge:
         requests.post(f'{BackendBridge.base_url}/action/stop')
     def clean(self):
         requests.post(f'{BackendBridge.base_url}/action/clean')
+    def get_kernels(self):
+        r=requests.get(f'{BackendBridge.base_url}/system/kernels')
+        return r.json()
+    def get_filesystems(self):
+        r=requests.get(f'{BackendBridge.base_url}/system/filesystems')
+        return r.json()
