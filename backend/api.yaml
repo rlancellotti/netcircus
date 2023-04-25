@@ -49,7 +49,7 @@ paths:
       - name: actionname
         in: path
         required: true
-        description: "Name of the action. Can be: start, stop, halt, save, load"
+        description: "Name of the action. Can be: clean, start, stop, halt, save, load"
         type: string
     post:
       description: "Perform action"
@@ -184,7 +184,7 @@ definitions:
     example: ["host1", "host2"]
   Host:
     type: object
-    required: [id]
+    required: []
     properties:
       id: {type: string, example: "h1"}
       name: {type: string, example: "client_host"}

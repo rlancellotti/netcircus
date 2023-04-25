@@ -150,7 +150,20 @@ class Network:
                     tar.extract(f, path=netcircus_paths.WORKAREA)
         # load config
         self.load_config()
-            
+
+    def clean(self):
+        for c in self.hosts:
+            del(self.objects[c.id])
+            c.clean()
+            self.hosts.remove(c)
+        for c in self.switches:
+            del(self.objects[c.id])
+            c.clean()
+            self.switches.remove(c)
+        for c in self.cables:
+            del(self.objects[c.id])
+            self.cables.remove(c)
+
 
 def get_info(f: tarfile.TarInfo) -> str:
     return f'{f.name} {f.size} {typename(f.type)}'

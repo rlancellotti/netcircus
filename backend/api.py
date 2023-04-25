@@ -43,6 +43,7 @@ class HostResource(Resource):
         else: return None, 404
     def post(self, id):
         data=request.json
+        data['id']=id
         print(id, data)
         h=net.get_element_by_id(id)
         print(h)
@@ -59,6 +60,9 @@ class HostResource(Resource):
 
 class ActionResource(Resource):
     def post(self, action):
+        if action == 'clean':
+            net.clean()
+            return None, 200
         if action == 'start':
             net.start_up()
             return None, 200
