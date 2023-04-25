@@ -68,6 +68,10 @@ class Host(Component):
         rv['height']=self.height
         return rv
 
+    def clean(self):
+        if os.path.exists(self.cow):
+            os.remove(self.cow)
+
     def check_cow(self, cow, fs):
         if os.path.exists(cow) and (os.path.getmtime(fs) > os.path.getmtime(cow)):
             self.log(logging.WARNING, f'backing file {fs} is newer than cow {cow}')
@@ -118,7 +122,6 @@ class Host(Component):
 
     def connect_to_switch(self, host_port, component, switch_port):
         self.command(f'config eth{host_port}=vde,{netcircus_paths.WORKAREA}/{component},{Host.get_mac()},{switch_port}')
-
 
 def hex_dump(data):
     for i in range(len(data)):

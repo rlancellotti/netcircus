@@ -7,13 +7,13 @@ import cairo
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
 
-@Gtk.Template(filename="nc_canvas.ui")
+@Gtk.Template(filename="resources/nc_canvas.ui")
 class NcCanvas(Gtk.DrawingArea):
     __gtype_name__ = "NcCanvas"
     def __init__(self):
         super().__init__()
-        self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png('host.png'),
-                    ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png('switch.png')}
+        self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png('resources/host.png'),
+                    ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png('resources/switch.png')}
         #self.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
         self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON1_MOTION_MASK) 
         self.network_model=NetworkModel()
@@ -23,6 +23,7 @@ class NcCanvas(Gtk.DrawingArea):
         self.action=None
         self.selected_component=None
         self.build_context_menu()
+        self.network_model.clean()
 
     def build_context_menu(self):
         self.cmenu = Gtk.Menu.new()
@@ -60,6 +61,14 @@ class NcCanvas(Gtk.DrawingArea):
             c=self.network_model.get_component(self.current_component)
             (c.x, c.y)=icon_coords_from_center(x, y, c.width, c.height)
             self.queue_draw()
+
+    ############### Actions on network ###############
+
+    def run_network(self):
+        self.network_model.backend.run_network()
+
+    def stop_network(self):
+        self.network_model.backend.stop_network()
 
     ############### Callbacks ###############
 

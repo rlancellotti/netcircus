@@ -37,6 +37,9 @@ class Component:
     def dump(self):
         pass
 
+    def clean(self):
+        pass
+
     def log(self, loglevel, msg, *args):
         self.logger.log(loglevel, msg, *args)
 

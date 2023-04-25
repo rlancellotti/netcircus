@@ -7,7 +7,7 @@ from nc_canvas import NcCanvas
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
 
-@Gtk.Template(filename="nc_palette.ui")
+@Gtk.Template(filename="resources/nc_palette.ui")
 class NcPalette(Gtk.Bin):
     __gtype_name__ = "NcPalette"
     #can define the named entries in the class
@@ -34,7 +34,7 @@ class NcPalette(Gtk.Bin):
     def get_action_from_widget(self, widget):
         for action in self.buttons.keys():
             if widget==self.buttons[action]:
-                print(f'identified wiget for action {action}')
+                #print(f'identified wiget for action {action}')
                 return action
 
     def is_no_action(self):
@@ -45,7 +45,7 @@ class NcPalette(Gtk.Bin):
         
 
     def set_action(self, action):
-        print(f'call to set_action({action}), old status is {self.action}')
+        #print(f'call to set_action({action}), old status is {self.action}')
         self.action=action
         if self.canvas is not None:
             self.canvas.set_action(action)
@@ -62,7 +62,7 @@ class NcPalette(Gtk.Bin):
         else:
             if self.is_no_action():
                 self.set_action(ACTION_MOVE)
-        print(f'toggle: action is: {self.action}')
+        #print(f'toggle: action is: {self.action}')
 
 if __name__ == '__main__':
     window = Gtk.Window()
