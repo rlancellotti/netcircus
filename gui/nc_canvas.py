@@ -3,6 +3,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from component import ComponentModel, LinkModel, NetworkModel
+from nc_edit_host import NcEditHost
 import cairo
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
@@ -24,6 +25,8 @@ class NcCanvas(Gtk.DrawingArea):
         self.selected_component=None
         self.build_context_menu()
         self.network_model.clean()
+        self.edit_host_dialog=None
+
 
     def build_context_menu(self):
         self.cmenu = Gtk.Menu.new()
@@ -55,6 +58,8 @@ class NcCanvas(Gtk.DrawingArea):
 
     def edit_component(self, widget):
         print(f'editing component {self.selected_component}')
+        self.edit_host_dialog=NcEditHost(self.network_model.get_component(self.selected_component))
+        self.edit_host_dialog.show_all()
 
     def update_current_component_pos(self, x, y):
         if self.current_component is not None and self.action==ACTION_MOVE:
