@@ -23,28 +23,31 @@ class Host(Component):
         self.kernel = data['kernel'] if 'kernel' in data.keys() else netcircus_paths.get_kernels()[0]
         self.fs = data['filesystem'] if 'filesystem' in data.keys() else netcircus_paths.get_filesystems()[0]
         self.cow = data['cow'] if 'cow' in data.keys() else f'{netcircus_paths.WORKAREA}/{self.id}.cow'
-        self.mem = '%dM' % data['mem'] if 'mem' in data.keys() else '96M'
+        self.mem = int(data['mem']) if 'mem' in data.keys() else '96'
         self.x = data['x' ] if 'mem' in data.keys() else '0.0'
         self.y = data['y' ] if 'mem' in data.keys() else '0.0'
         self.width = data['width' ] if 'mem' in data.keys() else '0.0'
         self.height = data['height' ] if 'mem' in data.keys() else '0.0'
         self.check_cow(self.cow, self.fs)
         self.ready=False
-        self.console = self.name + '_cmd'
+        self.console = self.id + '_cmd'
         self.console_signals['stop'] = 'cad'
         self.console_signals['halt'] = 'halt'
         self.console_signals['check'] = 'version > /dev/null 2>&1'
         self.command_queue=[]
-        self.ready_socket_name=f'{netcircus_paths.WORKAREA}/socket_ready_{self.name}.s'
+        self.ready_socket_name=f'{netcircus_paths.WORKAREA}/socket_ready_{self.id}.s'
         self.set_ready_socket()
-        self.cmdline = self.kernel + f' mem={self.mem}M ubd0={self.cow},{self.fs} umid={self.console} mconsole=notify:{self.ready_socket_name} hostname={self.name}'
-        self.log(logging.DEBUG, self.cmdline)
         self.network.add(self)
+
+    def get_cmdline(self):
+        cmdline=self.kernel + f' mem={int(self.mem)}M ubd0={self.cow},{self.fs} umid={self.console} mconsole=notify:{self.ready_socket_name} hostname={self.name}'
+        print(cmdline)
+        return cmdline
 
     def update(self, data):
         if 'name' in data.keys(): self.name=data['name']
         if 'description' in data.keys(): self.description=data['description']
-        if 'mem' in data.keys(): self.mem='%dM' % data['mem'] 
+        if 'mem' in data.keys(): self.mem = data['mem'] 
         if 'kernel' in data.keys(): self.kernel=data['kernel']
         if 'filesystem' in data.keys(): self.filesystem=data['filesystem']
         if 'cow' in data.keys(): self.cow=data['cow']
@@ -52,6 +55,7 @@ class Host(Component):
         if 'y' in data.keys(): self.y=data['y']
         if 'width' in data.keys(): self.width=data['width']
         if 'height' in data.keys(): self.height=data['height']
+        print(self.dump())
 
     def dump(self) -> dict:
         rv={}

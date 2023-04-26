@@ -82,6 +82,6 @@ api.add_resource(SystemResource, f'{basePath}/system/<string:res>')
 api.add_resource(ActionResource, f'{basePath}/action/<string:action>')
 api.add_resource(HostList, f'{basePath}/host')
 api.add_resource(HostResource, f'{basePath}/host/<string:id>')
-
+#FIXME: must add also support for switches and cables
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
