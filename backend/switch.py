@@ -21,12 +21,13 @@ class Switch(Component):
         self.console_signals['stop'] = 'shutdown'
         self.console_signals['halt'] = 'shutdown'
         self.console_signals['check'] = 'showlist > /dev/null 2>&1'
+        #FIXME: use correct paths
+        network.add(self)
+
+    def get_cmdline(self) -> str:
         daemon = '' if self.terminal else '-daemon'
         hub = '-hub' if self.is_hub else ''
-        #FIXME: use correct paths
-        self.cmdline = f"vde_switch {daemon} -n {str(self.n_ports)} {hub} -s {netcircus_paths.WORKAREA}/{self.name} --mgmt {netcircus_paths.WORKAREA}/{self.console}.mgmt"
-        self.log(logging.DEBUG, self.cmdline)
-        network.add(self)
+        return f"vde_switch {daemon} -n {str(self.n_ports)} {hub} -s {netcircus_paths.WORKAREA}/{self.name} --mgmt {netcircus_paths.WORKAREA}/{self.console}.mgmt"
 
     def init_from_parameters(self, name, label, n_ports, is_hub, terminal):
         self.name = name

@@ -26,8 +26,14 @@ class ComponentModel():
         rv=self.free_connect
         self.free_connect += 1
         return rv
-    def update_backend_data(self, data):
-        self.backend_data=data
+    def update_backend_data(self, data: dict, push:bool=False):
+        if self.backend_data is None:
+            self.backend_data=data
+        else:
+            for k in data.keys():
+                self.backend_data[k]=data[k]
+        if push:
+            self.backend.update_host(self)
     def update_pos(self, x,y):
         self.x=x
         self.y=y
@@ -41,9 +47,12 @@ class LinkModel():
         self.a_port=a.new_connection()
         self.b=b
         self.b_port=b.new_connection()
-    def update_backend_data(self, data):
-        #FIXME: To implement
-        self.backend_data=data
+    def update_backend_data(self, data: dict):
+        if self.backend_data is None:
+            self.backend_data=data
+        else:
+            for k in data.keys():
+                self.backend_data[k]=data[k]
 
 class NetworkModel():
     def __init__(self):
@@ -65,7 +74,7 @@ class NetworkModel():
         self.links[l.id]=l
 
     def delete_component(self, c):
-        if type(c) == int:
+        if type(c) == str:
             c=self.get_component(c)
         del(self.components[c.id])
         for l in self.get_links():
@@ -109,6 +118,8 @@ class BackendBridge:
     def add_host(self, h: ComponentModel):
         r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json={'x': h.x, 'y': h.y, 'width': h.width, 'height': h.height})
         h.update_backend_data(r.json())
+    def update_host(self, h: ComponentModel):
+        r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json=h.backend_data)
     def get_host(self, id):
         requests.get(f'{BackendBridge.base_url}/host/{id}')
     def run_network(self):

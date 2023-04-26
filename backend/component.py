@@ -21,8 +21,10 @@ class Component:
         self.console_signals = {'stop': None,
                                 'halt': None,
                                 'check': None}
-        self.cmdline = None
         #self.start_check()
+
+    def get_cmdline(self) -> str:
+        return ''
 
     def start_check(self):
         self.log(logging.DEBUG, 'call to start_check')
@@ -44,7 +46,8 @@ class Component:
         self.logger.log(loglevel, msg, *args)
 
     def launch(self):
-        os.system(f'x-terminal-emulator -T {self.name} -e \"{self.cmdline}\"')
+        print(f'starting with component with {self.get_cmdline()}')
+        os.system(f'x-terminal-emulator -T {self.name} -e \"{self.get_cmdline()}\"')
         self.status=Component.Status_Starting
         self.log(logging.INFO, 'Starting')
         self.start_check()

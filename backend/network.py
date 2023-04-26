@@ -74,7 +74,9 @@ class Network:
                 return
 
     def start_up(self):
+        print('executing network startup')
         for c in self.hosts + self.switches:
+            print(f'network start of {c.id} -> {c.name}')
             t = threading.Thread(target=c.launch, args=())
             t.daemon = True
             t.start()
@@ -90,9 +92,10 @@ class Network:
                     t.start()
 
     def shutdown(self):
+        print('executing network shutdown')
         for c in self.hosts + self.switches:
             if c.check():
-                #print('Shutting down ' + c.name)
+                print(f'network stop of {c.id} -> {c.name}')
                 c.shutdown()
 
     def poweroff(self):

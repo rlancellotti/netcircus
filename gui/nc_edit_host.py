@@ -38,13 +38,35 @@ class NcEditHost(Gtk.Dialog):
         for f in fslist:
             #kernel_model.append([os.path.basename(k), k])
             fs_model.append([f])
-        # set values for current host
-        # FIXME: must select right element in combo box
-        # FIXME: must set right value in memory
         print(self.component.backend_data['id'], self.component.backend_data['name'], self.component.backend_data['description'])
         self.name.set_text(self.component.backend_data['name'])
         self.description.set_text(self.component.backend_data['description'])
-    def set_filesystems(self, fslist: list):
-        pass
-    def set_kernels(self, klist: list):
-        pass
+        m=self.component.backend_data['mem']
+        self.memory.set_value(int(m[0:-1]) if type(m) == str and m.endswith('M') else int(m))
+        # FIXME: must select right element in combo box
+        for i in range(len(fslist)):
+            if fslist[i] == self.component.backend_data['filesystem']:
+                self.filesystem.set_active(i)
+        for i in range(len(klist)):
+            if klist[i] == self.component.backend_data['kernel']:
+                self.kernel.set_active(i)
+    # FIXME: must add all needed signal handlers. If some handler is not needed, remove it from .ui file
+    @Gtk.Template.Callback()
+    def on_ok(self, widget):
+        print('save data and close window')
+        # FIXME: management of kernel and filesystem is messed up
+        # FIXME 
+        self.component.update_backend_data({
+            'id': self.component.id, 
+            'name': self.name.get_text(),
+            'x': self.component.x,
+            'y': self.component.y,
+            'mem': self.memory.get_value(),
+            'kernel': self.kernel.get_model()[self.kernel.get_active()][0],
+            'filesystem': self.filesystem.get_model()[self.filesystem.get_active()][0]
+        }, push=True)
+        self.destroy()
+    @Gtk.Template.Callback()
+    def on_cancel(self, widget):
+        print('close window without saving')
+        self.destroy()
