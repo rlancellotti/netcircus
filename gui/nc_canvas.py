@@ -65,6 +65,7 @@ class NcCanvas(Gtk.DrawingArea):
         if self.current_component is not None and self.action==ACTION_MOVE:
             c=self.network_model.get_component(self.current_component)
             (c.x, c.y)=icon_coords_from_center(x, y, c.width, c.height)
+            # FIXME: send update also to backend
             self.queue_draw()
 
     ############### Actions on network ###############
@@ -74,6 +75,8 @@ class NcCanvas(Gtk.DrawingArea):
 
     def stop_network(self):
         self.network_model.backend.stop_network()
+    
+    #FIXME: add action halt network!
 
     ############### Callbacks ###############
 
@@ -145,6 +148,12 @@ class NcCanvas(Gtk.DrawingArea):
         #print(self.icons[c.type])
         cx.set_source_surface(self.icons[c.type], c.x, c.y)
         cx.paint()
+        # FIXME: show name of component: improve choice of font and size, improve positioning. desciption should be on the row below the name in smaller font
+        if c.backend_data is not None and 'name' in c.backend_data.keys():
+            print(f'priting name of {c.id}: {c.backend_data["name"]}')
+            cx.set_source_rgb(0, 0, 0)
+            cx.move_to(c.x, c.y-10)
+            cx.show_text(c.backend_data['name'])
 
     def draw_link(self, cx: cairo.Context, l: LinkModel):
         #print(f'drawing component @({c.x}, {c.y}, w={self.icons[c.type].get_width()}, h={self.icons[c.type].get_height()}), type={c.type}')
@@ -152,6 +161,7 @@ class NcCanvas(Gtk.DrawingArea):
         cx.move_to(*icon_center(l.a))
         cx.line_to(*icon_center(l.b))
         cx.stroke()
+        # FIXME: write port number
     
     def draw_selection(self, cx):
         if self.selected_component is not None:
