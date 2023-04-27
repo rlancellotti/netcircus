@@ -17,6 +17,8 @@
 - Add support for modules in system UML using hostfs. Must distinguish between monolithic kernels and modular ones
 - Improve support for component deletion/update
 - Add support for additional consoles in hosts (accessible only from backend) for testing purposes.
+- Better logging
+
 
 ## New features involving API
 
@@ -39,13 +41,14 @@
 - Add menu for save/load projects
 - Add dialog for save/load projects
 - Add visual feedback for component status in GUI (Running/Stopped)
+- Add button for network halt (not shutdown)
 
 ## Hardening
 
 - Check for code injection attacks
 - Verify return codes in API
 - Check data consistency in API
-- Check forbidden actions. Some examples below.
+- Check forbidden actions (Both gui and backend). Some examples below.
 - Save/load not allowed if network is running
 - Editing of network not allowed if network is running
 - Start not allowed if network is running
