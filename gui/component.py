@@ -120,7 +120,7 @@ class BackendBridge:
         h.update_backend_data(r.json())
     def update_host(self, h: ComponentModel):
         r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json=h.backend_data)
-    def get_host(self, id):
+    def get_host(self, id: str):
         requests.get(f'{BackendBridge.base_url}/host/{id}')
     def run_network(self):
         requests.post(f'{BackendBridge.base_url}/action/start')
