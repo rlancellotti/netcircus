@@ -150,7 +150,7 @@ class NcCanvas(Gtk.DrawingArea):
         cx.paint()
         # FIXME: show name of component: improve choice of font and size, improve positioning. desciption should be on the row below the name in smaller font
         if c.backend_data is not None and 'name' in c.backend_data.keys():
-            print(f'priting name of {c.id}: {c.backend_data["name"]}')
+            #print(f'priting name of {c.id}: {c.backend_data["name"]}')
             cx.set_source_rgb(0, 0, 0)
             cx.move_to(c.x, c.y-10)
             cx.show_text(c.backend_data['name'])
