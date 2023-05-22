@@ -75,6 +75,9 @@ class NcCanvas(Gtk.DrawingArea):
 
     def stop_network(self):
         self.network_model.backend.stop_network()
+        
+    def halt_network(self):
+        self.network_model.backend.halt_network()
     
     #FIXME: add action halt network!
 

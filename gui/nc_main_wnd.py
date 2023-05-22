@@ -13,6 +13,7 @@ class NcMainWnd(Gtk.Window):
     canvas=Gtk.Template.Child('nc_canvas')
     btn_run=Gtk.Template.Child('btn_run')
     btn_stop=Gtk.Template.Child('btn_stop')
+    btn_halt=Gtk.Template.Child('btn_halt')
     def __init__(self):
         super().__init__(title="NetCircus")
         #print(self.palette, self.canvas)
@@ -24,6 +25,8 @@ class NcMainWnd(Gtk.Window):
             self.canvas.run_network()
         if widget == self.btn_stop:
             self.canvas.stop_network()
+        if widget == self.btn_halt:
+            self.canvas.halt_network()
 
     @Gtk.Template.Callback()
     def on_menu_toggled(self, widget):

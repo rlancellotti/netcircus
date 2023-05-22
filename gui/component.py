@@ -126,6 +126,8 @@ class BackendBridge:
         requests.post(f'{BackendBridge.base_url}/action/start')
     def stop_network(self):
         requests.post(f'{BackendBridge.base_url}/action/stop')
+    def halt_network(self):
+        requests.post(f'{BackendBridge.base_url}/action/halt')
     def clean(self):
         requests.post(f'{BackendBridge.base_url}/action/clean')
     def get_kernels(self):
