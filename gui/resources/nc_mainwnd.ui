@@ -43,6 +43,7 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">Menu</property>
             <signal name="toggled" handler="on_menu_toggled" swapped="no"/>
             <child>
               <object class="GtkImage">
@@ -58,6 +59,7 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
+            <property name="tooltip-text" translatable="yes">Run</property>
             <property name="image-position">right</property>
             <property name="always-show-image">True</property>
             <signal name="clicked" handler="on_action_clicked" swapped="no"/>
@@ -84,6 +86,7 @@
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">Stop</property>
                 <property name="stock">gtk-media-stop</property>
               </object>
             </child>
@@ -99,12 +102,11 @@
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
             <signal name="clicked" handler="on_action_clicked" swapped="no"/>
-
-            
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="tooltip-text" translatable="yes">Halt</property>
                 <property name="stock">gtk-stop</property>
               </object>
             </child>
