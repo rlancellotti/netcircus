@@ -99,6 +99,7 @@ class Host(Component):
             os.remove(self.ready_socket_name)
         self.ready_sock = socket.socket(socket.AF_UNIX, socket.SOCK_DGRAM)
         self.log(logging.DEBUG, self.ready_socket_name)
+        print(self.ready_socket_name)
         self.ready_sock.bind(self.ready_socket_name)
         self.log(logging.DEBUG, f'call to set_ready_socket on {str(self.ready_sock)}')
         threading.Thread(target=self.wait_ready, daemon=True).start()
