@@ -11,4 +11,5 @@ image/marionnet_rclocal.sh
 *.log
 work/*
 env/*
+.venv/*
 gui/nccanvas_cmenu.ui
