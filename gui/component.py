@@ -80,6 +80,7 @@ class NetworkModel():
         for l in self.get_links():
             if l.a==c or l.b == c:
                 del self.links[l.id]
+        self.backend.delete_element(c.id)
 
     def get_links(self):
         return list(self.links.values())
@@ -122,6 +123,8 @@ class BackendBridge:
         r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json=h.backend_data)
     def get_host(self, id: str):
         requests.get(f'{BackendBridge.base_url}/host/{id}')
+    def delete_element(self, id: str):
+        requests.delete(f'{BackendBridge.base_url}/host/{id}')
     def run_network(self):
         requests.post(f'{BackendBridge.base_url}/action/start')
     def stop_network(self):
