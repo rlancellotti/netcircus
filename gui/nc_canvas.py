@@ -153,9 +153,11 @@ class NcCanvas(Gtk.DrawingArea):
         cx.paint()
         # FIXME: show name of component: improve choice of font and size, improve positioning. desciption should be on the row below the name in smaller font
         if c.backend_data is not None and 'name' in c.backend_data.keys():
-            #print(f'priting name of {c.id}: {c.backend_data["name"]}')
-            cx.set_source_rgb(0, 0, 0)
-            cx.move_to(c.x, c.y-10)
+            cx.set_font_size(15)
+            (x, y, width, height, dx, dy) = cx.text_extents(c.backend_data['name'])  #getting text size
+            color=self.get_style_context().get_color(Gtk.StateFlags.NORMAL)         #getting the right color
+            cx.move_to(c.x + c.width/2 - width/2, c.y-10)
+            cx.set_source_rgb(color.red,color.green,color.blue)
             cx.show_text(c.backend_data['name'])
 
     def draw_link(self, cx: cairo.Context, l: LinkModel):
