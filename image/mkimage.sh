@@ -8,7 +8,12 @@ export ROOTPWD="root"
 export RESDIR=$( cd -- "$( dirname -- "$0" )" &> /dev/null && pwd )
 export UPDATE_ONLY="True"
 #export UPDATE_ONLY="False"
+if [ ! -e ${FSNAME} ] ; then
+    echo "Ignore UPDATE_ONLY flag because filesystem is missing"
+    export UPDATE_ONLY="False"
+fi
 if [ "${UPDATE_ONLY}" != "True" ] ; then
+    echo "Creating filesystem"
     PKG=$(for p in $(head -n-1 ${PKGLST}); do echo -n $p,; done; echo $(tail -n1 ${PKGLST}))
     rm -f ${FSNAME}
     dd if=/dev/zero of=${FSNAME} bs=1 count=1 seek=${FSSIZE}
@@ -16,6 +21,7 @@ if [ "${UPDATE_ONLY}" != "True" ] ; then
 fi
 sudo mount ${FSNAME} ${MNTPOINT} -o loop
 if [ "${UPDATE_ONLY}" != "True" ] ; then
+    echo "Running debootstrap"
     sudo debootstrap --include ${PKG} --arch ${ARCH} stable ${MNTPOINT}
 fi
 # set default hostname and prepare update...
