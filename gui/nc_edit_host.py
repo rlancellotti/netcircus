@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import gi
+import nc_canvas
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
 from component import ComponentModel, NetworkModel
@@ -22,9 +23,10 @@ class NcEditHost(Gtk.Dialog):
     memory=Gtk.Template.Child('memory')
     kernel=Gtk.Template.Child('kernel')
     filesystem=Gtk.Template.Child('filesystem')
-    def __init__(self, c: ComponentModel):
+    def __init__(self, c: ComponentModel, parent):
         super().__init__()
         self.component=c
+        self.parent=parent
         # add elements to list of kernels
         #self.kernel.set_entry_text_column(0)
         kernel_model=self.kernel.get_model()
@@ -63,9 +65,12 @@ class NcEditHost(Gtk.Dialog):
             'y': self.component.y,
             'mem': self.memory.get_value(),
             'kernel': self.kernel.get_model()[self.kernel.get_active()][0],
-            'filesystem': self.filesystem.get_model()[self.filesystem.get_active()][0]
+            'filesystem': self.filesystem.get_model()[self.filesystem.get_active()][0],
+            'description': self.description.get_text()
         }, push=True)
+        self.parent.queue_draw()
         self.destroy()
+        
     @Gtk.Template.Callback()
     def on_cancel(self, widget):
         print('close window without saving')

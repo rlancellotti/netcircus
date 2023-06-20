@@ -16,7 +16,7 @@ class NcCanvas(Gtk.DrawingArea):
         self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png('resources/host.png'),
                     ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png('resources/switch.png')}
         #self.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON1_MOTION_MASK) 
+        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON1_MOTION_MASK | Gdk.EventMask.POINTER_MOTION_MASK) 
         self.network_model=NetworkModel()
         self.current_component=None
         self.current_link_start=None
@@ -48,6 +48,9 @@ class NcCanvas(Gtk.DrawingArea):
             w=self.icons[comp_type].get_width()
             h=self.icons[comp_type].get_height()
             self.network_model.add_component(comp_type, *icon_coords_from_center(x, y, w, h), w, h)
+            self.selected_component=self.network_model.get_component_from_cords(x,y)
+            
+            self.edit_component(None)
             self.queue_draw()
 
     def delete_component(self, widget):
@@ -58,7 +61,7 @@ class NcCanvas(Gtk.DrawingArea):
 
     def edit_component(self, widget):
         print(f'editing component {self.selected_component}')
-        self.edit_host_dialog=NcEditHost(self.network_model.get_component(self.selected_component))
+        self.edit_host_dialog=NcEditHost(self.network_model.get_component(self.selected_component),self)
         self.edit_host_dialog.show_all()
 
     def update_current_component_pos(self, x, y):
@@ -83,8 +86,26 @@ class NcCanvas(Gtk.DrawingArea):
 
     ############### Callbacks ###############
 
+
+    def host_focused(self,x,y):
+        for i in self.network_model.components.values():
+            if i.type==ComponentModel.TYPE_HOST:
+                #print(f'x={i.x} y={i.y} w={i.width} h={i.height} mx={x} my{y}')
+                if i.x <= x <=i.x+i.width and i.y <= y <=i.y+i.height:
+                   return i.id
+        return None
+
+
     @Gtk.Template.Callback()
     def on_motion_notify_event(self, widget, event):
+        focused=self.host_focused(event.x, event.y)
+        if focused:
+            tooltip_text = self.network_model.components[focused].backend_data['description']
+            Gtk.Widget.set_tooltip_text(widget, split_string(tooltip_text,30))
+            Gtk.Widget.trigger_tooltip_query(widget)
+        else:
+            Gtk.Widget.set_tooltip_text(widget, None)
+
         if self.current_component is not None:
             #print('motion: updating component pos')
             self.update_current_component_pos(event.x, event.y)
@@ -155,7 +176,7 @@ class NcCanvas(Gtk.DrawingArea):
         if c.backend_data is not None and 'name' in c.backend_data.keys():
             cx.set_font_size(15)
             (x, y, width, height, dx, dy) = cx.text_extents(c.backend_data['name'])  #getting text size
-            color=self.get_style_context().get_color(Gtk.StateFlags.NORMAL)         #getting the right color
+            color=self.get_style_context().get_color(Gtk.StateFlags.NORMAL)         #getting the right color     
             cx.move_to(c.x + c.width/2 - width/2, c.y-10)
             cx.set_source_rgb(color.red,color.green,color.blue)
             cx.show_text(c.backend_data['name'])
@@ -190,6 +211,28 @@ def icon_coords_from_center(x, y, w, h):
 
 def icon_center(c: ComponentModel):
     return (c.x+c.width/2, c.y+c.height/2)
+
+def split_string(string, max_characters):       #splits a string in different lines 
+    if len(string) <= max_characters:
+        return string
+
+    result = []
+    current_line = ""
+
+    words = string.split()
+
+    for word in words:
+        if len(current_line + word) <= max_characters:
+            current_line += word + " "
+        else:
+            result.append(current_line.rstrip())
+            current_line = word + " "
+
+    # Add the last line if necessary
+    if current_line:
+        result.append(current_line.rstrip())
+
+    return "\n".join(result)
 
 if __name__ == '__main__':
     window = Gtk.Window()
