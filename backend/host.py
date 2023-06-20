@@ -24,10 +24,10 @@ class Host(Component):
         self.fs = data['filesystem'] if 'filesystem' in data.keys() else netcircus_paths.get_filesystems()[0]
         self.cow = data['cow'] if 'cow' in data.keys() else f'{netcircus_paths.WORKAREA}/{self.id}.cow'
         self.mem = int(data['mem']) if 'mem' in data.keys() else '96'
-        self.x = data['x' ] if 'mem' in data.keys() else '0.0'
-        self.y = data['y' ] if 'mem' in data.keys() else '0.0'
-        self.width = data['width' ] if 'mem' in data.keys() else '0.0'
-        self.height = data['height' ] if 'mem' in data.keys() else '0.0'
+        self.x = data['x' ] if 'x' in data.keys() else '0.0'
+        self.y = data['y' ] if 'y' in data.keys() else '0.0'
+        self.width = data['width' ] if 'width' in data.keys() else '0.0'
+        self.height = data['height' ] if 'height' in data.keys() else '0.0'
         self.check_cow(self.cow, self.fs)
         self.ready=False
         self.console = self.id + '_cmd'
