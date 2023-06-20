@@ -52,6 +52,12 @@ class NcEditHost(Gtk.Dialog):
         for i in range(len(klist)):
             if klist[i] == self.component.backend_data['kernel']:
                 self.kernel.set_active(i)
+        self.connect("key-press-event", self.on_key_press)
+
+    # Signal handler for the "key-press-event" signal
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.KEY_Return or event.keyval == Gdk.KEY_KP_Enter:
+            self.on_ok(None)
     # FIXME: must add all needed signal handlers. If some handler is not needed, remove it from .ui file
     @Gtk.Template.Callback()
     def on_ok(self, widget):
