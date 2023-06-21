@@ -118,7 +118,6 @@ class BackendBridge:
             sys.exit()
     def add_host(self, h: ComponentModel):
         r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json={'x': h.x, 'y': h.y, 'width': h.width, 'height': h.height})
-        print('JSON= ' + str(r.json) + 'FINE')
         h.update_backend_data(r.json())
     def update_host(self, h: ComponentModel):
         r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json=h.backend_data)
