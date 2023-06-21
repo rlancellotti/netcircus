@@ -1,9 +1,8 @@
 #!/usr/bin/python
 import gi
-import nc_canvas
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
-from component import ComponentModel, NetworkModel
+from nc_component import ComponentModel, NetworkModel
 import os
 
 
@@ -14,7 +13,8 @@ import os
 # - Kernel (from a list)
 # - Root FS (from a list)
 
-@Gtk.Template(filename="resources/nc_edit_host.ui")
+dir_path = os.path.dirname(os.path.realpath(__file__))
+@Gtk.Template(filename=os.path.join(dir_path, "resources/nc_edit_host.ui"))
 class NcEditHost(Gtk.Dialog):
     __gtype_name__ = "NcEditHost"
     #can define the named entries in the class

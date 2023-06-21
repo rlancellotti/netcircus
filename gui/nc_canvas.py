@@ -1,14 +1,16 @@
 #!/usr/bin/python
+import os
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
-from component import ComponentModel, LinkModel, NetworkModel
+from nc_component import ComponentModel, LinkModel, NetworkModel
 from nc_edit_host import NcEditHost
 import cairo
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
 
-@Gtk.Template(filename="resources/nc_canvas.ui")
+dir_path = os.path.dirname(os.path.realpath(__file__))
+@Gtk.Template(filename=os.path.join(dir_path, "resources/nc_canvas.ui"))
 class NcCanvas(Gtk.DrawingArea):
     __gtype_name__ = "NcCanvas"
     def __init__(self):

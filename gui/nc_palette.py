@@ -2,7 +2,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GdkPixbuf
-from component import ComponentModel
+from nc_component import ComponentModel
 from nc_canvas import NcCanvas
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
