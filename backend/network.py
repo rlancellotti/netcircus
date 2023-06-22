@@ -155,15 +155,15 @@ class Network:
         self.load_config()
 
     def clean(self):
-        for c in self.hosts:
+        for c in self.hosts[:]:
             del(self.objects[c.id])
             c.clean()
             self.hosts.remove(c)
-        for c in self.switches:
+        for c in self.switches[:]:
             del(self.objects[c.id])
             c.clean()
             self.switches.remove(c)
-        for c in self.cables:
+        for c in self.cables[:]:
             del(self.objects[c.id])
             self.cables.remove(c)
 

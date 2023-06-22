@@ -49,7 +49,7 @@ class Host(Component):
         if 'description' in data.keys(): self.description=data['description']
         if 'mem' in data.keys(): self.mem = data['mem'] 
         if 'kernel' in data.keys(): self.kernel=data['kernel']
-        if 'filesystem' in data.keys(): self.filesystem=data['filesystem']
+        if 'filesystem' in data.keys(): self.fs=data['filesystem']
         if 'cow' in data.keys(): self.cow=data['cow']
         if 'x' in data.keys(): self.x=data['x']
         if 'y' in data.keys(): self.y=data['y']
