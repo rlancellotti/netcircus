@@ -29,6 +29,12 @@ search_virtualenv() {
     done
 }
 
+# create directory work if missing
+WORKDIR="./work"
+if [ ! -d $WORKDIR ]; then
+    mkdir -p $WORKDIR
+fi
+
 # Start searching from the current directory
 echo searching for a virtual environment
 shopt -s dotglob                #including dotted directories
