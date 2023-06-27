@@ -1,11 +1,15 @@
 import time
+import os
+import sys
 import unittest
 import json
-from flask import Flask
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0,os.path.join(dir_path, "../backend"))
 import api
 
 
-#move to netcircus/backend and run "python3 -m tests.test_api_requests"  
+#move to netcircus/tests and run "python3 -m test_api_requests"  
 
 class IntegrationTest(unittest.TestCase):
     def setUp(self):
