@@ -5,6 +5,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 from nc_component import ComponentModel, LinkModel, NetworkModel
 from nc_edit_host import NcEditHost
+from nc_edit_switch import NcEditSwitch
 import cairo
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
@@ -28,6 +29,7 @@ class NcCanvas(Gtk.DrawingArea):
         self.build_context_menu()
         self.network_model.clean()
         self.edit_host_dialog=None
+        self.edit_switch_dialog=None
 
 
     def build_context_menu(self):
@@ -52,7 +54,9 @@ class NcCanvas(Gtk.DrawingArea):
             self.network_model.add_component(comp_type, *icon_coords_from_center(x, y, w, h), w, h)
             self.selected_component=self.network_model.get_component_from_cords(x,y)
             
-            self.edit_component(None)
+            if comp_type==ComponentModel.TYPE_HOST or comp_type==ComponentModel.TYPE_SWITCH:
+                self.edit_component(None)
+           
             self.queue_draw()
 
     def delete_component(self, widget):
@@ -63,8 +67,14 @@ class NcCanvas(Gtk.DrawingArea):
 
     def edit_component(self, widget):
         print(f'editing component {self.selected_component}')
-        self.edit_host_dialog=NcEditHost(self.network_model.get_component(self.selected_component),self)
-        self.edit_host_dialog.show_all()
+        component=self.network_model.get_component(self.selected_component)
+        if component.type==ComponentModel.TYPE_HOST:
+            self.edit_host_dialog=NcEditHost(component,self)
+            self.edit_host_dialog.show_all()
+        if component.type==ComponentModel.TYPE_SWITCH:
+            self.edit_switch_dialog=NcEditSwitch(component,self)
+            self.edit_switch_dialog.show_all()
+
 
     def update_current_component_pos(self, x, y):
         if self.current_component is not None and self.action==ACTION_MOVE:
@@ -185,7 +195,7 @@ class NcCanvas(Gtk.DrawingArea):
 
     def draw_link(self, cx: cairo.Context, l: LinkModel):
         #print(f'drawing component @({c.x}, {c.y}, w={self.icons[c.type].get_width()}, h={self.icons[c.type].get_height()}), type={c.type}')
-        cx.set_source_rgb(0, 0, 0)
+        cx.set_source_rgb(65/255,111/255, 168/255)
         cx.move_to(*icon_center(l.a))
         cx.line_to(*icon_center(l.b))
         cx.stroke()

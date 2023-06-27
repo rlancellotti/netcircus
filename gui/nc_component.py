@@ -21,6 +21,8 @@ class ComponentModel():
         self.backend=backend
         if component_type == ComponentModel.TYPE_HOST:
             backend.add_host(self)
+        if component_type == ComponentModel.TYPE_SWITCH:
+            backend.add_switch(self)
         print(self.backend_data)
     def new_connection(self):
         rv=self.free_connect
@@ -33,7 +35,7 @@ class ComponentModel():
             for k in data.keys():
                 self.backend_data[k]=data[k]
         if push:
-            self.backend.update_host(self)
+            self.backend.update_component(self)
     def update_pos(self, x,y):
         self.x=x
         self.y=y
@@ -66,9 +68,9 @@ class NetworkModel():
         self.components[c.id]=c
     
     def add_link(self, a, b):
-        if type(a) == int:
+        if type(a) == str:
             a=self.get_component(a)
-        if type(b) == int:
+        if type(b) == str:
             b=self.get_component(b)
         l=LinkModel(a, b)
         self.links[l.id]=l
@@ -80,7 +82,10 @@ class NetworkModel():
         for l in self.get_links():
             if l.a==c or l.b == c:
                 del self.links[l.id]
-        self.backend.delete_element(c.id)
+        if c.type==ComponentModel.TYPE_HOST:
+            self.backend.delete_host(c.id)
+        if c.type==ComponentModel.TYPE_SWITCH:
+            self.backend.delete_switch(c.id)
 
     def get_links(self):
         return list(self.links.values())
@@ -119,12 +124,24 @@ class BackendBridge:
     def add_host(self, h: ComponentModel):
         r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json={'x': h.x, 'y': h.y, 'width': h.width, 'height': h.height})
         h.update_backend_data(r.json())
-    def update_host(self, h: ComponentModel):
-        r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json=h.backend_data)
+    def update_component(self, h: ComponentModel):
+        if h.type==ComponentModel.TYPE_HOST:
+            r=requests.post(f'{BackendBridge.base_url}/host/{h.id}', json=h.backend_data)
+        if h.type==ComponentModel.TYPE_SWITCH:
+            r=requests.post(f'{BackendBridge.base_url}/switch/{h.id}', json=h.backend_data)
+
     def get_host(self, id: str):
         requests.get(f'{BackendBridge.base_url}/host/{id}')
-    def delete_element(self, id: str):
+    def add_switch(self, s: ComponentModel):
+            r=requests.post(f'{BackendBridge.base_url}/switch/{s.id}', json={'x': s.x, 'y': s.y, 'width': s.width, 'height': s.height})
+            s.update_backend_data(r.json())
+    def get_switch(self, id: str):
+        requests.get(f'{BackendBridge.base_url}/switch/{id}')
+
+    def delete_host(self, id: str):
         requests.delete(f'{BackendBridge.base_url}/host/{id}')
+    def delete_switch(self, id: str):
+        requests.delete(f'{BackendBridge.base_url}/switch/{id}')
     def run_network(self):
         requests.post(f'{BackendBridge.base_url}/action/start')
     def stop_network(self):
