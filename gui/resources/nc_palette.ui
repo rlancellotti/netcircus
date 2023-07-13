@@ -23,7 +23,6 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Move</property>
-                <property name="pixbuf">resources/pointer.png</property>
               </object>
             </child>
           </object>
@@ -43,7 +42,6 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Host</property>
-                <property name="pixbuf">resources/host.png</property>
               </object>
             </child>
           </object>
@@ -63,7 +61,6 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Switch</property>
-                <property name="pixbuf">resources/switch.png</property>
               </object>
             </child>
           </object>
@@ -83,7 +80,6 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="tooltip-text" translatable="yes">Connect</property>
-                <property name="pixbuf">resources/cable.png</property>
               </object>
             </child>
           </object>

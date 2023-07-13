@@ -16,8 +16,8 @@ class NcCanvas(Gtk.DrawingArea):
     __gtype_name__ = "NcCanvas"
     def __init__(self):
         super().__init__()
-        self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png('resources/host.png'),
-                    ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png('resources/switch.png')}
+        self.icons={ComponentModel.TYPE_HOST: cairo.ImageSurface.create_from_png(os.path.join(dir_path, "resources/host.png")),
+                    ComponentModel.TYPE_SWITCH: cairo.ImageSurface.create_from_png(os.path.join(dir_path, "resources/switch.png"))}
         #self.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
         self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK | Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON1_MOTION_MASK | Gdk.EventMask.POINTER_MOTION_MASK) 
         self.network_model=NetworkModel()

@@ -1,12 +1,16 @@
 #!/usr/bin/python
+import os
+import sys
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0,dir_path)
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from nc_palette import NcPalette
 from nc_canvas import NcCanvas
 
-
-@Gtk.Template(filename="resources/nc_mainwnd.ui")
+@Gtk.Template(filename=os.path.join(dir_path, "resources/nc_mainwnd.ui"))
 class NcMainWnd(Gtk.Window):
     __gtype_name__ = "NcMainWnd"
     palette=Gtk.Template.Child('nc_palette')
