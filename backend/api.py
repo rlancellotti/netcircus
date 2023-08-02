@@ -1,8 +1,15 @@
+import os
+import sys
+
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0,dir_path)
 from flask import Flask, request
 from flask_restful import Resource, Api
 import netcircus_paths
 import network
 import host
+import switch
 
 app = Flask(__name__)
 api=Api(app)
@@ -58,6 +65,29 @@ class HostResource(Resource):
             return None, 201
         else: return None, 404
 
+class SwitchResource(Resource):
+    def get(self, id):
+        s=net.get_element_by_id(id)
+        if s is not None:
+            return s.dump(), 200
+        else: return None, 404
+    def post(self, id):
+        data=request.json
+        data['id']=id
+        print(id, data)
+        s=net.get_element_by_id(id)
+        print(s)
+        if s is not None and type(s) is switch.Switch:
+            s.update(data)
+        else:
+            s=switch.Switch(net, data)
+        return s.dump(), 201
+    def delete(self, id):
+        if net.get_element_by_id(id) is not None:
+            net.delete_element(id)
+            return None, 201
+        else: return None, 404
+
 class ActionResource(Resource):
     def post(self, action):
         if action == 'clean':
@@ -82,6 +112,7 @@ api.add_resource(SystemResource, f'{basePath}/system/<string:res>')
 api.add_resource(ActionResource, f'{basePath}/action/<string:action>')
 api.add_resource(HostList, f'{basePath}/host')
 api.add_resource(HostResource, f'{basePath}/host/<string:id>')
+api.add_resource(SwitchResource, f'{basePath}/switch/<string:id>')
 #FIXME: must add also support for switches and cables
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)

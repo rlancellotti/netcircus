@@ -1,13 +1,15 @@
 #!/usr/bin/python
+import os
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk
 from nc_component import ComponentModel
 from nc_canvas import NcCanvas
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
 
-@Gtk.Template(filename="resources/nc_palette.ui")
+dir_path = os.path.dirname(os.path.realpath(__file__))
+@Gtk.Template(filename=os.path.join(dir_path, "resources/nc_palette.ui"))
 class NcPalette(Gtk.Bin):
     __gtype_name__ = "NcPalette"
     #can define the named entries in the class
@@ -27,6 +29,11 @@ class NcPalette(Gtk.Bin):
         self.canvas=None
         self.action=ACTION_MOVE
         self.set_action(self.action)
+
+        self.btn_move.get_child().set_from_file(os.path.join(dir_path, "resources/pointer.png"))
+        self.btn_connect.get_child().set_from_file(os.path.join(dir_path, "resources/cable.png"))
+        self.btn_host.get_child().set_from_file(os.path.join(dir_path, "resources/host.png"))
+        self.btn_switch.get_child().set_from_file(os.path.join(dir_path, "resources/switch.png"))
 
     def set_canvas(self, canvas: NcCanvas):
         self.canvas=canvas

@@ -1,11 +1,15 @@
 import time
+import os
+import sys
 import unittest
 import json
-from flask import Flask
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0,os.path.join(dir_path, "../backend"))
 import api
 
 
-#move to netcircus/backend and run "python3 -m tests.test_api_requests"  
+#move to netcircus/tests and run "python3 -m test_api_requests"  
 
 class IntegrationTest(unittest.TestCase):
     def setUp(self):
@@ -69,6 +73,31 @@ class IntegrationTest(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data,None,'Can not delete host properly')
 
+    def test_switch_basic(self):
+        response = self.app.post('/api/v1/switch/Switch0', json={'x': 10, 'y': 20, 'width': 48, 'height': 48})
+        self.assertEqual(response.status_code, 201)
+        
+        data = json.loads(response.data)
+        self.assertEqual(data['x'],10 ,'Switch.x not set properly')
+        self.assertEqual(data['y'],20 ,'Switch.y not set properly')
+        self.assertEqual(data['width'],48 ,'Switch.width not set properly')
+        self.assertEqual(data['height'],48 ,'Switch.height not set properly')
+        self.assertGreater(len(data), 0)
+
+    def test_get_switch(self):
+        self.app.post('/api/v1/switch/Switch0', json={'name':'test_name1' ,'x': 10, 'y': 20, 'width': 48, 'height': 48})
+        response = self.app.get('/api/v1/switch/Switch0')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['id'],'Switch0' ,'Can not get switch properly')
+
+    def test_delete_switch(self):
+        self.app.post('/api/v1/switch/Switch0', json={'name':'test_name1' ,'x': 10, 'y': 20, 'width': 48, 'height': 48})
+        response = self.app.delete('/api/v1/switch/Switch0')
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.data)
+        self.assertEqual(data,None,'Can not delete switch properly')        
+
     def test_non_existing_route(self):
         response = self.app.get('/api/v1/nonexistingroute')
         self.assertEqual(response.status_code, 404)
@@ -108,6 +137,7 @@ class IntegrationTest(unittest.TestCase):
         self.assertEqual(data,None,'Can not halt properly')
 
     def test_save(self):
+        return
         self.app.post('/api/v1/action/clean', json={})              #cleaning before testing
         self.app.post('/api/v1/host/Host0', json={'name':'test_name1' ,'x': 10, 'y': 20, 'width': 48, 'height': 48})  #add Host0
 

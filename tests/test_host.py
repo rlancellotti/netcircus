@@ -1,20 +1,19 @@
-from asyncio import Event
 import os
 import sys
 import threading
 import time
 import unittest
 import psutil
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0,os.path.join(dir_path, "../backend"))
+sys.path.insert(0,os.path.join(dir_path, "../gui"))
+import nc_component
 import host
 import network 
 import api
 
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0,os.path.join(dir_path, "../../gui"))
-import nc_component
-
-#move to netcircus/backend and run "python3 -m tests.test_host"  
+#move to netcircus/tests and run "python3 -m test_host"  
 
 
 def server():
