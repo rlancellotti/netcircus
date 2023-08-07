@@ -55,13 +55,22 @@ if [ $? -eq 0 ]; then
     lsof -i :8080 | grep "python3" | awk '{print $2}' | xargs kill
 fi
 
-# Check if the linux processes are listening on port 8080
+# Check if linux processes are listening on port 8080
 lsof -i :8080 | grep -q "linux"
 
 if [ $? -eq 0 ]; then
     echo "Linux processes are listening on port 8080"
     echo "Killing linux processes listening on port 8080"
     lsof -i :8080 | grep "linux" | awk '{print $2}' | xargs kill
+fi
+
+# Check if vde processes are listening on port 8080
+lsof -i :8080 | grep -q "vde"
+
+if [ $? -eq 0 ]; then
+    echo "Vde processes are listening on port 8080"
+    echo "Killing vde processes listening on port 8080"
+    lsof -i :8080 | grep "vde" | awk '{print $2}' | xargs kill
 fi
 
 echo "Starting backend"
