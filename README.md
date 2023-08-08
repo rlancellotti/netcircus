@@ -7,6 +7,7 @@ Requirements are referred to debian distributions and are expressed in terms of 
 - user-mode-linux
 - vde2
 - debootstrap (to create image)
+- uml-utilities
 
 ## Images
 Filesystems can be created using debootstrap with the mkimage.sh script
