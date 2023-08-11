@@ -173,6 +173,7 @@ class NcCanvas(Gtk.DrawingArea):
         self.draw_dangling_link(cx)
         for l in self.network_model.get_links():
             self.draw_link(cx, l)
+        self.draw_link_selection(cx)
         for c in self.network_model.get_components():
             self.draw_component(cx, c)
         self.draw_selection(cx)
@@ -193,22 +194,32 @@ class NcCanvas(Gtk.DrawingArea):
             cx.set_source_rgb(color.red,color.green,color.blue)
             cx.show_text(c.backend_data['name'])
 
-    def draw_link(self, cx: cairo.Context, l: LinkModel):
+    def draw_link(self, cx: cairo.Context, l: LinkModel, selected=False):
         #print(f'drawing component @({c.x}, {c.y}, w={self.icons[c.type].get_width()}, h={self.icons[c.type].get_height()}), type={c.type}')
-        cx.set_source_rgb(65/255,111/255, 168/255)
+        if selected:
+            cx.set_source_rgb(1, 0, 0)
+        else:
+            cx.set_source_rgb(65/255,111/255, 168/255)
         cx.move_to(*icon_center(l.a))
         cx.line_to(*icon_center(l.b))
         cx.stroke()
         # FIXME: write port number
+
+    def draw_link_selection(self, cx):
+        if self.selected_component is not None:
+            l=self.network_model.get_link(self.selected_component)
+            if  isinstance(l,LinkModel):
+                self.draw_link(cx,l,True)
     
     def draw_selection(self, cx):
         if self.selected_component is not None:
             #print(f'drawing selection for component {self.selected_component}')
             c=self.network_model.get_component(self.selected_component)
-            cx.set_source_rgb(1, 0, 0)
-            cx.rectangle(c.x, c.y, c.width, c.height)
-            cx.stroke()
-
+            if isinstance(c,ComponentModel):
+                cx.set_source_rgb(1, 0, 0)
+                cx.rectangle(c.x, c.y, c.width, c.height)
+                cx.stroke()
+            
     def draw_dangling_link(self, cx: cairo.Context):
         #print('call to draw_dangling_link')
         if self.current_link_start is not None and self.current_link_end is not None:

@@ -126,6 +126,7 @@ class Host(Component):
         os.remove(self.ready_socket_name)
 
     def connect_to_switch(self, host_port, component, switch_port):
+        time.sleep(5)
         self.command(f'config eth{host_port}=vde,{netcircus_paths.WORKAREA}/{component},{Host.get_mac()},{switch_port}')
 
 def hex_dump(data):

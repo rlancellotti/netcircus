@@ -6,3 +6,4 @@ dnsmasq
 dbus
 tcpdump
 netcat-traditional
+arping

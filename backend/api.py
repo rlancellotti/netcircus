@@ -10,6 +10,7 @@ import netcircus_paths
 import network
 import host
 import switch
+import cable
 
 app = Flask(__name__)
 api=Api(app)
@@ -65,6 +66,26 @@ class HostResource(Resource):
             return None, 201
         else: return None, 404
 
+class CableResource(Resource):
+    def get(self, id):
+        c=net.get_element_by_id(id)
+        if c is not None:
+            return c.dump(), 200
+        else: return None, 404
+    def post(self, id):
+        data=request.json
+        data['id']=id
+        print(id, data)
+        c=cable.Cable(net, id,endpoint_A=net.get_element_by_id(data['endpoint_A']), port_A= data['port_A'],
+                      endpoint_B=net.get_element_by_id(data['endpoint_B']), port_B=data['port_B'])
+        return c.dump(), 201
+    
+    def delete(self, id):
+        if net.get_element_by_id(id) is not None:
+            net.delete_element(id)
+            return None, 201
+        else: return None, 404
+
 class SwitchResource(Resource):
     def get(self, id):
         s=net.get_element_by_id(id)
@@ -113,6 +134,7 @@ api.add_resource(ActionResource, f'{basePath}/action/<string:action>')
 api.add_resource(HostList, f'{basePath}/host')
 api.add_resource(HostResource, f'{basePath}/host/<string:id>')
 api.add_resource(SwitchResource, f'{basePath}/switch/<string:id>')
+api.add_resource(CableResource, f'{basePath}/cable/<string:id>')
 #FIXME: must add also support for switches and cables
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
