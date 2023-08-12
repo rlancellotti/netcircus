@@ -205,6 +205,23 @@ class NcCanvas(Gtk.DrawingArea):
         cx.line_to(*icon_center(l.b))
         cx.stroke()
         # FIXME: write port number
+        self.draw_port_name(cx, l , True)
+        self.draw_port_name(cx, l , False)
+
+    def  draw_port_name(self, cx, l, a):
+        if a:
+            k=find_port_position(icon_center(l.a),icon_center(l.b), l.a.width, l.a.height)
+            port=l.a_port
+        else:
+            k=find_port_position(icon_center(l.b),icon_center(l.a), l.a.width, l.a.height, reverse=True)
+            port=l.b_port
+        color=self.get_style_context().get_color(Gtk.StateFlags.NORMAL) 
+        cx.move_to(k[0],k[1])
+        cx.set_source_rgb(color.red,color.green,color.blue)
+        cx.set_font_size(15)
+        cx.show_text(str(port))
+
+
 
     def draw_link_selection(self, cx):
         if self.selected_component is not None:
@@ -254,6 +271,33 @@ def icon_coords_from_center(x, y, w, h):
 
 def icon_center(c: ComponentModel):
     return (c.x+c.width/2, c.y+c.height/2)
+
+def find_point_on_segment(A, B, D):
+    vector_AB = (B[0] - A[0], B[1] - A[1])
+    length_AB = ((vector_AB[0]) ** 2 + (vector_AB[1]) ** 2) ** 0.5
+    
+    P_x = A[0] + (D / length_AB) * vector_AB[0]
+    P_y = A[1] + (D / length_AB) * vector_AB[1]
+    
+    return P_x, P_y
+
+def find_perpendicular_point(P, A, B, D, reverse=False):
+    AB = (B[0] - A[0], B[1] - A[1])
+    length_AB = ((AB[0]) ** 2 + (AB[1]) ** 2) ** 0.5
+    normalized_AB = (AB[0] / length_AB, AB[1] / length_AB)
+    if not reverse:
+        perpendicular_vector = (-normalized_AB[1], normalized_AB[0])
+    else:
+        perpendicular_vector = (normalized_AB[1], -normalized_AB[0])
+    PK = (perpendicular_vector[0] * D, perpendicular_vector[1] * D)
+    K = (P[0] + PK[0], P[1] + PK[1])
+    
+    return K
+
+def find_port_position(a, b, w, h, reverse=False):
+    P = find_point_on_segment(a, b, max(w,h)/2+30)
+    K = find_perpendicular_point(P, a, b, 14, reverse=reverse)
+    return K
 
 def split_string(string, max_characters):       #splits a string in different lines 
     if len(string) <= max_characters:
