@@ -7,7 +7,7 @@ class ComponentModel():
     TYPE_SWITCH = 'Switch'
     TYPE_UNKNOWN = ''
     next_id=0
-    def __init__(self, component_type, x, y, width, height, backend):
+    def __init__(self, component_type, x, y, width, height, backend, load=False, backend_data=None):
         self.name = None
         self.id=f'{component_type}{ComponentModel.next_id}'
         ComponentModel.next_id += 1
@@ -20,12 +20,13 @@ class ComponentModel():
             self.free_connect=0
         else:
             self.free_connect=1
-        self.backend_data=None
+        self.backend_data=backend_data
         self.backend=backend
-        if component_type == ComponentModel.TYPE_HOST:
-            backend.add_host(self)
-        if component_type == ComponentModel.TYPE_SWITCH:
-            backend.add_switch(self)
+        if not load:
+            if component_type == ComponentModel.TYPE_HOST:
+                backend.add_host(self)
+            if component_type == ComponentModel.TYPE_SWITCH:
+                backend.add_switch(self)
         print(self.backend_data)
     def new_connection(self):
         rv=self.free_connect
@@ -45,15 +46,22 @@ class ComponentModel():
 
 class LinkModel():
     next_id=0
-    def __init__(self, a, b, backend):
-        self.id=f'Link{LinkModel.next_id}'
+    def __init__(self, a, b, backend, load=False, backend_data=None):
         LinkModel.next_id += 1
         self.a=a
-        self.a_port=a.new_connection()
         self.b=b
-        self.b_port=b.new_connection()
         self.backend=backend
-        backend.add_cable(self)
+        if load:
+            self.id=backend_data['id']
+            self.a_port=backend_data['port_A']
+            self.b_port=backend_data['port_B']
+            self.backend_data=backend_data
+        else:
+            self.id=f'Link{LinkModel.next_id}'
+            self.a_port=a.new_connection()
+            self.b_port=b.new_connection()
+            backend.add_cable(self)
+            
     def update_backend_data(self, data: dict):
         if self.backend_data is None:
             self.backend_data=data
@@ -67,17 +75,21 @@ class NetworkModel():
         self.links={}
         self.backend=BackendBridge()
 
-    def add_component(self, component_type, x, y, width, height):
+
+    def init_from_config():
+        pass
+
+    def add_component(self, component_type, x, y, width, height, load=False, backend_data=None):
         print(f'adding component @({x},{y})')
-        c=ComponentModel(component_type, x, y, width, height, backend=self.backend)
+        c=ComponentModel(component_type, x, y, width, height, backend=self.backend, load=load,backend_data=backend_data)
         self.components[c.id]=c
     
-    def add_link(self, a, b):
+    def add_link(self, a, b, load=False, backend_data=None):
         if type(a) == str:
             a=self.get_component(a)
         if type(b) == str:
             b=self.get_component(b)
-        l=LinkModel(a, b, backend=self.backend)
+        l=LinkModel(a, b, backend=self.backend, load=load, backend_data=backend_data)
         self.links[l.id]=l
 
     def delete_component(self, c):
@@ -190,3 +202,10 @@ class BackendBridge:
         return r.json()
     def add_cable(self, l: LinkModel):
         r=requests.post(f'{BackendBridge.base_url}/cable/{l.id}', json={'endpoint_A':l.a.id ,'port_A': l.a_port,'endpoint_B':l.b.id,'port_B':l.b_port})
+    def save_network(self, name):
+        requests.post(f'{BackendBridge.base_url}/action/save',json={'name':name})
+    def load_network(self, name):
+        requests.post(f'{BackendBridge.base_url}/action/load',json={'name':name})
+    def get_workarea(self):
+        r=requests.get(f'{BackendBridge.base_url}/system/workarea')
+        return r.json()

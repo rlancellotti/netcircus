@@ -26,6 +26,8 @@ class SystemResource(Resource):
             return netcircus_paths.get_filesystems(), 200
         if res == 'networkname':
             return net.get_name(), 200
+        if res == 'workarea':
+            return netcircus_paths.WORKAREA, 200
         return None, 404
     def post(self, res):
         n=request.json
@@ -125,9 +127,14 @@ class ActionResource(Resource):
             return None, 200
         if action == 'save':
             # FIXME: can use filename from request body
-            net.save()
+            data=request.json
+            name=data['name']
+            net.save(name)
             return None, 200
-        # FIXME: must implement 'load' action
+        if action== 'load':
+            data=request.json
+            name=data['name']
+            net.load(name)
 
 api.add_resource(SystemResource, f'{basePath}/system/<string:res>')
 api.add_resource(ActionResource, f'{basePath}/action/<string:action>')

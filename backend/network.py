@@ -136,10 +136,10 @@ class Network:
             self.name=conf['network_name']
             # hosts
             for h in conf['hosts']:
-                Host(self, dump=h)
+                Host(self, data=h)
             # switches
             for s in conf['switches']:
-                Switch(self, dump=s)
+                Switch(self, data=s)
             # cables
             for c in conf['cables']:
                 Cable(self, dump=c)

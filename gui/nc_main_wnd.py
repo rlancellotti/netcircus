@@ -26,6 +26,11 @@ class NcMainWnd(Gtk.Window):
         #print(self.palette, self.canvas)
         self.palette.set_canvas(self.canvas)
 
+    def update_load_button_state(self, dialog):
+        selected_file = dialog.get_filename()
+        if selected_file is not None:
+            self.btn_load.set_sensitive(selected_file.endswith(".tgz"))
+
     @Gtk.Template.Callback()
     def on_action_clicked(self, widget):
         if widget == self.btn_run:
@@ -38,42 +43,78 @@ class NcMainWnd(Gtk.Window):
             dialog = Gtk.FileChooserDialog(
             title="Please choose a folder",
             parent=self,
-            action=Gtk.FileChooserAction.SELECT_FOLDER,
+            action=Gtk.FileChooserAction.OPEN,
             )
             dialog.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK
+            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Load", Gtk.ResponseType.OK
             )
             dialog.set_default_size(800, 400)
 
+            filter_tgz = Gtk.FileFilter()
+            filter_tgz.set_name("TGZ files")
+            filter_tgz.add_pattern("*.tgz")
+            dialog.add_filter(filter_tgz)
+
+            self.btn_load = dialog.get_widget_for_response(Gtk.ResponseType.OK)
+            self.btn_load.set_sensitive(False)  # Imposta il pulsante non cliccabile all'inizio
+
+            dialog.connect("selection-changed", self.update_load_button_state)  # Aggiungi il collegamento alla funzione
+
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                print("Select clicked")
-                print("Folder selected: " + dialog.get_filename())
+                self.canvas.load_network(dialog.get_filename())
             elif response == Gtk.ResponseType.CANCEL:
                 print("Cancel clicked")
 
             dialog.destroy()
 
-        
+
         if widget == self.btn_save:
             dialog = Gtk.FileChooserDialog(
             title="Please choose a folder",
             parent=self,
             action=Gtk.FileChooserAction.SELECT_FOLDER,
-            )
+             )
             dialog.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Select", Gtk.ResponseType.OK
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK
             )
             dialog.set_default_size(800, 400)
 
+
+            content_area = dialog.get_content_area()
+
+            name_entry = Gtk.Entry()
+            name_entry.set_placeholder_text("Enter file name")
+            content_area.add(name_entry)  # Aggiungi l'entry all'area di contenuto
+
+            dialog.set_default_size(400, 200)
+            dialog.show_all()
+    
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
-                print("Select clicked")
-                print("Folder selected: " + dialog.get_filename())
+                folder_path = dialog.get_filename()
+                file_name = name_entry.get_text()
+
+                if not file_name:
+                    dialog = Gtk.MessageDialog(
+                    parent=self,
+                    flags=Gtk.DialogFlags.MODAL,
+                    type=Gtk.MessageType.ERROR,
+                    buttons=Gtk.ButtonsType.OK,
+                    message_format="Please enter a valid file name."
+                    )
+                    dialog.run()
+                    dialog.destroy()
+                else:
+                    full_path = f"{folder_path}/{file_name}.tgz"
+                    self.canvas.save_network(full_path)
             elif response == Gtk.ResponseType.CANCEL:
                 print("Cancel clicked")
-
+    
             dialog.destroy()
+
+
+
 
     @Gtk.Template.Callback()
     def on_menu_toggled(self, widget):

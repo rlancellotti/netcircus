@@ -4,7 +4,7 @@ from switch import Switch
 import os
 
 class Cable:
-    def __init__(self, network, id, name=None, endpoint_A=None, port_A=None, endpoint_B=None, port_B=None, dump=None):
+    def __init__(self, network, id=None, name=None, endpoint_A=None, port_A=None, endpoint_B=None, port_B=None, dump=None):
         """
 
         :param i: numero cavo
@@ -24,9 +24,9 @@ class Cable:
         self.network=network
         self.name = dump['name']
         self.type = dump['type']
-        self.A = network.get_element_by_name(dump['endpoint_A'])
+        self.A = network.get_element_by_id(dump['endpoint_A'])
         self.port_A = dump['port_A']
-        self.B = network.get_element_by_name(dump['endpoint_B'])
+        self.B = network.get_element_by_id(dump['endpoint_B'])
         self.port_B = dump['port_B']
         self.id=dump['id']
 
@@ -52,10 +52,11 @@ class Cable:
     def dump(self) -> dict:
         rv={}
         rv['name']=self.name
+        rv['id']=self.id
         rv['type']=self.type
-        rv['endpoint_A']=self.A.name
+        rv['endpoint_A']=self.A.id
         rv['port_A']=self.port_A
-        rv['endpoint_B']=self.B.name
+        rv['endpoint_B']=self.B.id
         rv['port_B']=self.port_B
         return rv
 

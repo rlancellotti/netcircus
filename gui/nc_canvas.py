@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import json
 import os
 import gi
 gi.require_version('Gtk', '3.0')
@@ -228,6 +229,25 @@ class NcCanvas(Gtk.DrawingArea):
             cx.move_to(*icon_center(self.network_model.get_component(self.current_link_start)))
             cx.line_to(*self.current_link_end)
             cx.stroke()
+
+    def save_network(self,name):
+        self.network_model.backend.save_network(name)
+
+    def load_network(self,name):
+        self.network_model.backend.load_network(name)
+        workarea=self.network_model.backend.get_workarea()
+        with open(workarea + '/config.json', 'r') as f:
+            conf=json.load(f)
+            for h in conf['hosts']:
+                self.network_model.add_component('Host', h['x'],h['y'], h['width'], h['height'], load=True, backend_data=h)
+            for s in conf['switches']:
+                self.network_model.add_component('Switch', s['x'],s['y'], s['width'], s['height'], load=True, backend_data=h)
+            for c in conf['cables']:
+                self.network_model.add_link(c['endpoint_A'],c['endpoint_B'] , load=True,backend_data=c)
+        self.queue_draw()
+                
+           
+
 
 def icon_coords_from_center(x, y, w, h):
     return (x-w/2, y-h/2)
