@@ -258,7 +258,7 @@ class NcCanvas(Gtk.DrawingArea):
             for h in conf['hosts']:
                 self.network_model.add_component('Host', h['x'],h['y'], h['width'], h['height'], load=True, backend_data=h)
             for s in conf['switches']:
-                self.network_model.add_component('Switch', s['x'],s['y'], s['width'], s['height'], load=True, backend_data=h)
+                self.network_model.add_component('Switch', s['x'],s['y'], s['width'], s['height'], load=True, backend_data=s)
             for c in conf['cables']:
                 self.network_model.add_link(c['endpoint_A'],c['endpoint_B'] , load=True,backend_data=c)
         self.queue_draw()

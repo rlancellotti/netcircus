@@ -64,7 +64,7 @@ class Network:
             if type(obj) == Cable:
                 self.cables.remove(obj)
             for c in self.cables:
-                if c.a == obj or c.b == obj:
+                if c.A == obj or c.B == obj:
                     self.cables.remove(c)
             if type(obj) == Host:
                 self.hosts.remove(obj)

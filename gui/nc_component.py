@@ -6,11 +6,12 @@ class ComponentModel():
     TYPE_HOST = 'Host'
     TYPE_SWITCH = 'Switch'
     TYPE_UNKNOWN = ''
+    ids=[]
     next_id=0
     def __init__(self, component_type, x, y, width, height, backend, load=False, backend_data=None):
         self.name = None
-        self.id=f'{component_type}{ComponentModel.next_id}'
-        ComponentModel.next_id += 1
+        
+        #ComponentModel.next_id += 1
         self.type = component_type
         self.x = x
         self.y = y
@@ -23,10 +24,14 @@ class ComponentModel():
         self.backend_data=backend_data
         self.backend=backend
         if not load:
+            self.id=f'{component_type}{ComponentModel.get_next_id()}'
             if component_type == ComponentModel.TYPE_HOST:
                 backend.add_host(self)
             if component_type == ComponentModel.TYPE_SWITCH:
                 backend.add_switch(self)
+        else:
+            self.id=backend_data['id']
+            ComponentModel.ids.append(int(self.id[len(self.type):]))
         print(self.backend_data)
     def new_connection(self):
         rv=self.free_connect
@@ -43,6 +48,18 @@ class ComponentModel():
     def update_pos(self, x,y):
         self.x=x
         self.y=y
+    def get_next_id():
+        start=0
+        while True:
+            if start in ComponentModel.ids:
+                start+=1
+                continue
+            else:
+                ComponentModel.ids.append(start)
+                return start
+    def remove_id(self):
+        id= int(self.id[len(self.type):])
+        ComponentModel.ids.remove(id)
 
 class LinkModel():
     next_id=0
@@ -115,6 +132,7 @@ class NetworkModel():
                     del self.links[l.id]
             if c.type==ComponentModel.TYPE_HOST:
                 self.backend.delete_host(c.id)
+                c.remove_id()
             if c.type==ComponentModel.TYPE_SWITCH:
                 self.backend.delete_switch(c.id)
 
