@@ -61,8 +61,8 @@ class Cable:
         return rv
     
     def update(self, data):
-        if 'a_port' in data.keys(): self.port_A=data['a_port']
-        if 'b_port' in data.keys(): self.port_B=data['b_port']
+        if 'port_A' in data.keys(): self.port_A=data['port_A']
+        if 'port_B' in data.keys(): self.port_B=data['port_B']
         print(self.dump())
 
     def make_switches_connection(self):

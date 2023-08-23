@@ -123,6 +123,7 @@ class NetworkModel():
         print(f'adding component @({x},{y})')
         c=ComponentModel(component_type, x, y, width, height, backend=self.backend, load=load,backend_data=backend_data)
         self.components[c.id]=c
+        return c
     
     def add_link(self, a, b, load=False, backend_data=None):
         if type(a) == str:

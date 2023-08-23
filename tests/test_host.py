@@ -56,9 +56,7 @@ class HostsTestCase(unittest.TestCase):
     #tests only the frontend
     def test_host_gui_creation1(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_HOST,20,30,48,48)
-        host_id=f'{nc_component.ComponentModel.TYPE_HOST}{nc_component.ComponentModel.next_id-1}'
-        host=network_model.components[host_id]
+        host=network_model.add_component(nc_component.ComponentModel.TYPE_HOST,20,30,48,48)
 
         self.assertEqual(20,host.x,'Host.x not set properly')
         self.assertEqual(30,host.y,'Host.y not set properly')
@@ -68,9 +66,7 @@ class HostsTestCase(unittest.TestCase):
     #tests only the frontend
     def test_host_gui_creation2(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_HOST,20,30,48,48)
-        host_id=f'{nc_component.ComponentModel.TYPE_HOST}{nc_component.ComponentModel.next_id-1}'
-        host=network_model.components[host_id]
+        host=network_model.add_component(nc_component.ComponentModel.TYPE_HOST,20,30,48,48)
         update_data={'id': 'Host0', 'name': 'unnamed', 'description': '', 'kernel': '/usr/bin/linux', 
                         'filesystem': '/path/Documenti/Code/NetCircus/image/root.ext4', 
                         'cow': '/path/Documenti/Code/NetCircus/work/Host0.cow', 'mem': '96',
@@ -83,10 +79,8 @@ class HostsTestCase(unittest.TestCase):
     #tests both backend and frontend
     def test_host_integration1(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_HOST,20,30,48,48)
-        host_id=f'{nc_component.ComponentModel.TYPE_HOST}{nc_component.ComponentModel.next_id-1}'
-        host=network_model.components[host_id]                  #frontend reference
-        h=api.net.get_element_by_id(str(host_id))               #backend reference
+        host=network_model.add_component(nc_component.ComponentModel.TYPE_HOST,20,30,48,48)    #frontend reference
+        h=api.net.get_element_by_id(str(host.id))               #backend reference
         
         
         self.assertEqual(20,h.x, f'Host.x not set properly')
@@ -98,15 +92,13 @@ class HostsTestCase(unittest.TestCase):
     #tests both backend and frontend (update too)
     def test_host_integration2(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_HOST,25,35,55,46)
-        host_id=f'{nc_component.ComponentModel.TYPE_HOST}{nc_component.ComponentModel.next_id-1}'
-        host=network_model.components[host_id]                  #frontend reference
-        update_data={'id': str(host_id), 'name': 'test_name', 'description': 'descr', 'kernel': 'custom/path', 
+        host=network_model.add_component(nc_component.ComponentModel.TYPE_HOST,25,35,55,46)   #frontend reference
+        update_data={'id': str(host.id), 'name': 'test_name', 'description': 'descr', 'kernel': 'custom/path', 
                         'filesystem': '/path/Documenti/Code/NetCircus/image/root.ext4', 
                         'cow': '/path/Documenti/Code/NetCircus/work/Host0.cow', 'mem': '76',
                         'x': 50, 'y': 30, 'width': 47, 'height': 28}
         host.update_backend_data(update_data, True)             
-        h=api.net.get_element_by_id(str(host_id))               #backend reference
+        h=api.net.get_element_by_id(str(host.id))               #backend reference
         
         for key1 in update_data.keys():
             key2=key1

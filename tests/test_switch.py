@@ -14,7 +14,7 @@ import network
 import api
 import switch
 
-#move to netcircus/tests and run "python3 -m test_host"  
+#move to netcircus/tests and run "python3 -m test_switch"  
 
 
 def server():
@@ -57,9 +57,7 @@ class SwitchesTestCase(unittest.TestCase):
     #tests only the frontend
     def test_switch_gui_creation1(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,20,30,48,48)
-        switch_id=f'{nc_component.ComponentModel.TYPE_SWITCH}{nc_component.ComponentModel.next_id-1}'
-        switch=network_model.components[switch_id]
+        switch=network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,20,30,48,48)
 
         self.assertEqual(20,switch.x,'Switch.x not set properly')
         self.assertEqual(30,switch.y,'Switch.y not set properly')
@@ -69,9 +67,7 @@ class SwitchesTestCase(unittest.TestCase):
     #tests only the frontend
     def test_switch_gui_creation2(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,20,30,48,48)
-        switch_id=f'{nc_component.ComponentModel.TYPE_SWITCH}{nc_component.ComponentModel.next_id-1}'
-        switch=network_model.components[switch_id]
+        switch=network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,20,30,48,48)
         update_data={'id': 'Switch0', 'name': 'unnamed', 'label': '',  'n_ports':5 , 'is_hub' : True ,
                       'terminal' : True, 'x': 20, 'y': 30, 'width': 48, 'height': 48}
         switch.update_backend_data(update_data)
@@ -82,10 +78,8 @@ class SwitchesTestCase(unittest.TestCase):
     #tests both backend and frontend
     def test_switch_integration1(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,20,30,48,48)
-        switch_id=f'{nc_component.ComponentModel.TYPE_SWITCH}{nc_component.ComponentModel.next_id-1}'
-        switch=network_model.components[switch_id]                  #frontend reference
-        s=api.net.get_element_by_id(str(switch_id))               #backend reference
+        switch=network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,20,30,48,48)       #frontend reference
+        s=api.net.get_element_by_id(str(switch.id))               #backend reference
         
         
         self.assertEqual(20,s.x, f'Switch.x not set properly')
@@ -97,14 +91,12 @@ class SwitchesTestCase(unittest.TestCase):
     #tests both backend and frontend (update too)
     def test_switch_integration2(self):
         network_model=nc_component.NetworkModel()
-        network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,25,35,55,46)
-        switch_id=f'{nc_component.ComponentModel.TYPE_SWITCH}{nc_component.ComponentModel.next_id-1}'
-        switch=network_model.components[switch_id]                  #frontend reference
-        update_data={'id': str(switch_id), 'name': 'test_name', 
+        switch=network_model.add_component(nc_component.ComponentModel.TYPE_SWITCH,25,35,55,46)  #frontend reference        
+        update_data={'id': str(switch.id), 'name': 'test_name', 
                       'label': '',  'n_ports':5 , 'is_hub' : True ,'terminal' : True,
                         'x': 50, 'y': 30, 'width': 47, 'height': 28}
         switch.update_backend_data(update_data, True)             
-        s=api.net.get_element_by_id(str(switch_id))               #backend reference
+        s=api.net.get_element_by_id(str(switch.id))               #backend reference
         
         for key in update_data.keys():
             self.assertEqual(switch.backend_data[key],getattr(s, key), f'Switch.{key} not set properly')
