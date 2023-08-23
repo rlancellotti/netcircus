@@ -78,7 +78,11 @@ class CableResource(Resource):
         data=request.json
         data['id']=id
         print(id, data)
-        c=cable.Cable(net, id,endpoint_A=net.get_element_by_id(data['endpoint_A']), port_A= data['port_A'],
+        c=net.get_element_by_id(id)
+        if c is not None and type(c) is cable.Cable:
+            c.update(data)
+        else:
+            c=cable.Cable(net, id,endpoint_A=net.get_element_by_id(data['endpoint_A']), port_A= data['port_A'],
                       endpoint_B=net.get_element_by_id(data['endpoint_B']), port_B=data['port_B'])
         return c.dump(), 201
     

@@ -59,6 +59,11 @@ class Cable:
         rv['endpoint_B']=self.B.id
         rv['port_B']=self.port_B
         return rv
+    
+    def update(self, data):
+        if 'a_port' in data.keys(): self.port_A=data['a_port']
+        if 'b_port' in data.keys(): self.port_B=data['b_port']
+        print(self.dump())
 
     def make_switches_connection(self):
         os.system(f'dpipe vde_plug {netcircus_paths.WORKAREA}/{self.A.name} = vde_plug {netcircus_paths.WORKAREA}/{self.B.name}')

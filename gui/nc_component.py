@@ -7,7 +7,7 @@ class ComponentModel():
     TYPE_SWITCH = 'Switch'
     TYPE_UNKNOWN = ''
     ids=[]
-    next_id=0
+    #next_id=0
     def __init__(self, component_type, x, y, width, height, backend, load=False, backend_data=None):
         self.name = None
         
@@ -79,12 +79,10 @@ class LinkModel():
             self.b_port=b.new_connection()
             backend.add_cable(self)
             
-    def update_backend_data(self, data: dict):
-        if self.backend_data is None:
-            self.backend_data=data
-        else:
-            for k in data.keys():
-                self.backend_data[k]=data[k]
+    def update_cable(self, data: dict):
+        self.a_port=data['a_port']
+        self.b_port=data['b_port']
+        self.backend.add_cable(self)
 
 class NetworkModel():
     def __init__(self):
@@ -95,6 +93,31 @@ class NetworkModel():
 
     def init_from_config():
         pass
+
+    def switch_ports(self,c:LinkModel, new_port, old_port, a=True):
+        if a:
+            component=c.a
+            c.a_port=new_port
+        else:
+            component=c.b
+            c.b_port=new_port
+
+        c.backend.add_cable(c)
+
+        for l in self.links.values():
+            if l==c:
+                continue
+            if l.a==component and l.a_port==new_port:
+                l.a_port=old_port
+                l.backend.add_cable(l)
+                break
+            if l.b==component and l.b_port==new_port:
+                l.b_port=old_port
+                l.backend.add_cable(l)
+                break
+
+
+
 
     def add_component(self, component_type, x, y, width, height, load=False, backend_data=None):
         print(f'adding component @({x},{y})')
@@ -117,8 +140,7 @@ class NetworkModel():
         elif type(c) == str:
             s=c
             c=self.get_component(s)
-            if c is None:
-                c=self.get_link(s)
+            if isinstance(c,LinkModel):
                 cable=True
             else:
                 cable=False
@@ -146,7 +168,21 @@ class NetworkModel():
         return list(self.components.values())
     
     def get_component(self, id):
-        return self.components[id] if id in self.components.keys() else None
+        if id in self.components.keys():
+            return self.components[id]
+        elif id in self.links.keys():
+            return self.links[id]
+        else:
+            return None
+
+    def get_interfaces(self,c:ComponentModel):
+        interfaces=[]
+        for l in self.links.values():
+            if l.a.id == c.id:
+                interfaces.append(l.a_port)
+            if l.b.id == c.id:
+                interfaces.append(l.b_port)
+        return interfaces
 
     def get_component_from_cords(self, x, y):
         for c in reversed(self.get_components()):

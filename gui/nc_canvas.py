@@ -7,6 +7,7 @@ from gi.repository import Gtk, Gdk
 from nc_component import ComponentModel, LinkModel, NetworkModel
 from nc_edit_host import NcEditHost
 from nc_edit_switch import NcEditSwitch
+from nc_edit_cable import NcEditCable
 import cairo
 
 (ACTION_NONE, ACTION_MOVE, ACTION_CONNECT, ACTION_HOST, ACTION_SWITCH) = range(5)
@@ -69,16 +70,19 @@ class NcCanvas(Gtk.DrawingArea):
     def edit_component(self, widget):
         print(f'editing component {self.selected_component}')
         component=self.network_model.get_component(self.selected_component)
-        if component.type==ComponentModel.TYPE_HOST:
-            self.edit_host_dialog=NcEditHost(component,self)
-            self.edit_host_dialog.show_all()
-        if component.type==ComponentModel.TYPE_SWITCH:
-            self.edit_switch_dialog=NcEditSwitch(component,self)
-            self.edit_switch_dialog.show_all()
+        if isinstance(component,ComponentModel):
+            if component.type==ComponentModel.TYPE_HOST:
+                self.edit_host_dialog=NcEditHost(component,self)
+                self.edit_host_dialog.show_all()
+            if component.type==ComponentModel.TYPE_SWITCH:
+                self.edit_switch_dialog=NcEditSwitch(component,self)
+                self.edit_switch_dialog.show_all()
+        if isinstance(component,LinkModel):
+            self.edit_cable_dialog=NcEditCable(component,self)
+            self.edit_cable_dialog.show_all()
 
-
-    def update_current_component_pos(self, x, y):
-        if self.current_component is not None and self.action==ACTION_MOVE:
+    def update_current_component_pos(self, x, y):            
+        if self.current_component is not None and self.action==ACTION_MOVE and isinstance(self.network_model.get_component(self.current_component),ComponentModel):
             c=self.network_model.get_component(self.current_component)
             (c.x, c.y)=icon_coords_from_center(x, y, c.width, c.height)
             # FIXME: send update also to backend
@@ -140,7 +144,9 @@ class NcCanvas(Gtk.DrawingArea):
                 self.current_component=self.network_model.get_component_from_cords(event.x, event.y)
                 self.selected_component=self.network_model.get_component_from_cords(event.x, event.y)
             if self.action==ACTION_CONNECT:
-                self.current_link_start=self.network_model.get_component_from_cords(event.x, event.y)
+                start=self.network_model.get_component_from_cords(event.x, event.y)
+                if isinstance(self.network_model.get_component(start),ComponentModel):
+                    self.current_link_start=start
                 #print(f'connect from @({event.x}, {event.y}) -> {self.current_link_start}')
             if self.action==ACTION_HOST:
                 self.add_component(ComponentModel.TYPE_HOST, event.x, event.y)
@@ -262,7 +268,13 @@ class NcCanvas(Gtk.DrawingArea):
             for c in conf['cables']:
                 self.network_model.add_link(c['endpoint_A'],c['endpoint_B'] , load=True,backend_data=c)
         self.queue_draw()
-                
+
+
+    def get_interfaces(self,c:ComponentModel):
+        return self.network_model.get_interfaces(c)
+        
+    def switch_ports(self,c:LinkModel, new_port, old_port, a=True):
+        return self.network_model.switch_ports(c,new_port,old_port,a)
            
 
 
