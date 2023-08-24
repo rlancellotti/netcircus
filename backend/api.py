@@ -68,6 +68,10 @@ class HostResource(Resource):
             return None, 201
         else: return None, 404
 
+class CableList(Resource):
+    def get(self):
+        return net.get_elements(network.ELEMENT_CABLE)
+    
 class CableResource(Resource):
     def get(self, id):
         c=net.get_element_by_id(id)
@@ -92,6 +96,9 @@ class CableResource(Resource):
             return None, 201
         else: return None, 404
 
+class SwitchList(Resource):
+    def get(self):
+        return net.get_elements(network.ELEMENT_SWITCH)
 class SwitchResource(Resource):
     def get(self, id):
         s=net.get_element_by_id(id)
@@ -144,7 +151,9 @@ api.add_resource(SystemResource, f'{basePath}/system/<string:res>')
 api.add_resource(ActionResource, f'{basePath}/action/<string:action>')
 api.add_resource(HostList, f'{basePath}/host')
 api.add_resource(HostResource, f'{basePath}/host/<string:id>')
+api.add_resource(SwitchList, f'{basePath}/switch')
 api.add_resource(SwitchResource, f'{basePath}/switch/<string:id>')
+api.add_resource(CableList, f'{basePath}/cable')
 api.add_resource(CableResource, f'{basePath}/cable/<string:id>')
 #FIXME: must add also support for switches and cables
 if __name__ == '__main__':

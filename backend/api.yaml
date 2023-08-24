@@ -11,7 +11,7 @@ paths:
       - name: resource
         in: path
         required: true
-        description: "Name of the resource. Can be: kernels, filesystems"
+        description: "Name of the resource. Can be: kernels, filesystems, networkname, workarea"
         type: string
     get:
       description: "Get list of resource"
@@ -203,11 +203,14 @@ definitions:
     properties:
       id: {type: string, example: "s1"}
       name: {type: string, example: "switch1"}
-      description: {type: string, example: "The switch"}
+      label: {type: string, example: "The switch"}
       x: {type: number, example: "1.0"}
       y: {type: number, example: "1.0"}
       width: {type: number, example: "1.0"}
       height: {type: number, example: "1.0"}
+      n_ports: {type: number, example: "20"}
+      is_hub : {type: boolean, example: "False"}
+      terminal : {type: boolean, example: "False"}
   Link:
     type: object
     required: [name, id_a, port_a, id_b, port_b]
