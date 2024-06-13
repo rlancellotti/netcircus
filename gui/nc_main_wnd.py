@@ -40,13 +40,15 @@ class NcMainWnd(Gtk.Window):
         if widget == self.btn_halt:
             self.canvas.halt_network()
         if widget == self.btn_load:
+            # FIXME: rewrite using template
             dialog = Gtk.FileChooserDialog(
-            title="Please choose a folder",
-            parent=self,
-            action=Gtk.FileChooserAction.OPEN,
+                title="Please choose a folder",
+                parent=self,
+                action=Gtk.FileChooserAction.OPEN,
             )
             dialog.add_buttons(
-            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Load", Gtk.ResponseType.OK
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, 
+                Gtk.STOCK_OPEN, Gtk.ResponseType.OK
             )
             dialog.set_default_size(800, 400)
 
@@ -65,43 +67,40 @@ class NcMainWnd(Gtk.Window):
                 self.canvas.load_network(dialog.get_filename())
             elif response == Gtk.ResponseType.CANCEL:
                 print("Cancel clicked")
-
             dialog.destroy()
-
-
         if widget == self.btn_save:
             dialog = Gtk.FileChooserDialog(
-            title="Please choose a folder",
-            parent=self,
-            action=Gtk.FileChooserAction.SELECT_FOLDER,
-             )
+                title="Please choose a folder",
+                parent=self,
+                action=Gtk.FileChooserAction.SAVE,
+            )
             dialog.add_buttons(
-                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, "Save", Gtk.ResponseType.OK
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, 
+                Gtk.STOCK_SAVE, Gtk.ResponseType.OK
             )
             dialog.set_default_size(800, 400)
-
-
             content_area = dialog.get_content_area()
-
             name_entry = Gtk.Entry()
             name_entry.set_placeholder_text("Enter file name")
             content_area.add(name_entry)  # Aggiungi l'entry all'area di contenuto
 
             dialog.set_default_size(400, 200)
             dialog.show_all()
-    
+            #FIXME: deprected code. Save dialog does not work
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 folder_path = dialog.get_filename()
                 file_name = name_entry.get_text()
-
+                #FIXME: must validate path
+                #FIXME: must evaluate file name
+                print(f'saving to: {folder_path}/{file_name}')
                 if not file_name:
                     dialog = Gtk.MessageDialog(
-                    parent=self,
-                    flags=Gtk.DialogFlags.MODAL,
-                    type=Gtk.MessageType.ERROR,
-                    buttons=Gtk.ButtonsType.OK,
-                    message_format="Please enter a valid file name."
+                        parent=self,
+                        #modal=True,
+                        type=Gtk.MessageType.ERROR,
+                        buttons=Gtk.ButtonsType.OK,
+                        message_format="Please enter a valid file name."
                     )
                     dialog.run()
                     dialog.destroy()
@@ -110,7 +109,6 @@ class NcMainWnd(Gtk.Window):
                     self.canvas.save_network(full_path)
             elif response == Gtk.ResponseType.CANCEL:
                 print("Cancel clicked")
-    
             dialog.destroy()
 
 

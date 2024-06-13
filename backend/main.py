@@ -21,12 +21,12 @@ def check_paths():
             os.makedirs(p)
 
 def simple_main():
-    network = Network(name='test')
-    host1 = Host(network, name='host1', label='', mem=96)
-    host2 = Host(network, name='host2', label='', mem=96)
-    switch1 = Switch(network, 'switch1', '', 4)
-    Cable(network, 'cable1', host1, 0, switch1, 1)
-    Cable(network, 'cable2', host2, 0, switch1, 2)
+    network = Network('test_network')
+    host1 = Host(network, data={'id': 'host1', 'name':'host1', 'mem': 96})
+    host2 = Host(network, data={'id': 'host2', 'name':'host2', 'mem': 96})
+    switch1 = Switch(network, data={'id':'switch1'})
+    Cable(network, 'cable1', 'cable1', host1, 0, switch1, 1)
+    Cable(network, 'cable2', 'cable1', host2, 0, switch1, 2)
 
     network.start_up()
     #print('Network is up')
@@ -49,5 +49,5 @@ def restore():
  
 if __name__ == '__main__':
     check_paths()
-    #simple_main()
-    restore()
+    simple_main()
+    #restore()

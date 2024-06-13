@@ -6,6 +6,8 @@ import time
 import threading
 import logging
 
+logging.basicConfig(level=logging.DEBUG)
+
 class Host(Component):
     mac_counter = 0
     mac_prefix = '02:04:06'
@@ -117,6 +119,7 @@ class Host(Component):
             self.command_queue.append(command)
             return None
         rv=False
+        self.log(logging.DEBUG, f'executing command: uml_mconsole {self.console} {command}')
         if os.system(f'uml_mconsole {self.console} {command}') == 0:
             rv=True
         self.log_command(command, rv)

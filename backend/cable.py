@@ -66,7 +66,8 @@ class Cable:
         print(self.dump())
 
     def make_switches_connection(self):
-        os.system(f'dpipe vde_plug {netcircus_paths.WORKAREA}/{self.A.name} = vde_plug {netcircus_paths.WORKAREA}/{self.B.name}')
+        print(f'Call to make_switches_connection: dpipe vde_plug {netcircus_paths.WORKAREA}/{self.A.id} = vde_plug {netcircus_paths.WORKAREA}/{self.B.id}')
+        os.system(f'dpipe vde_plug {netcircus_paths.WORKAREA}/{self.A.id} = vde_plug {netcircus_paths.WORKAREA}/{self.B.id}')
 
     def make_host_switch_connection(self):
-        self.A.connect_to_switch(self.port_A, self.B.name, self.port_B)
+        self.A.connect_to_switch(self.port_A, self.B.id, self.port_B)
