@@ -1,5 +1,5 @@
-import netcircus_paths
-from component import Component
+from . import netcircus_paths
+from .component import Component
 import logging
 import os
 
@@ -21,7 +21,7 @@ class Switch(Component):
         self.y = data['y' ] if 'y' in data.keys() else '0.0'
         self.width = data['width' ] if 'width' in data.keys() else '0.0'
         self.height = data['height' ] if 'height' in data.keys() else '0.0'
-        self.n_ports=data['n_ports' ] if 'n_ports' in data.keys() else 4
+        self.n_ports=int(data['n_ports' ]) if 'n_ports' in data.keys() else 4
         self.is_hub = data['is_hub'] if 'is_hub' in data.keys() else False
         self.terminal = data['terminal'] if 'terminal' in data.keys() else False
         self.ready=False
@@ -37,7 +37,7 @@ class Switch(Component):
     def get_cmdline(self) -> str:
         daemon = '' if self.terminal else '-daemon'
         hub = '-hub' if self.is_hub else ''
-        cmdline=f"vde_switch {daemon} -n {int(self.n_ports)} {hub} -s {netcircus_paths.WORKAREA}/{self.id} --mgmt {netcircus_paths.WORKAREA}/{self.console}.mgmt"
+        cmdline=f"vde_switch {daemon} -n {self.n_ports} {hub} -s {netcircus_paths.WORKAREA}/{self.id} --mgmt {netcircus_paths.WORKAREA}/{self.console}.mgmt"
         return cmdline
 
     def init_from_parameters(self, name, label, n_ports, is_hub, terminal):
@@ -69,7 +69,7 @@ class Switch(Component):
         return rv
 
     def command(self, command):
-        # 65280 exit status comando unixcmd
+        # 65280 exit status of unixcmd
         if os.system(f'unixcmd -s {netcircus_paths.WORKAREA}/{self.console}.mgmt -f /etc/vde2/vdecmd {command}') == 65280:
             return True
         return False

@@ -1,7 +1,7 @@
-import netcircus_paths
-from host import Host
-from switch import Switch
-from cable import Cable
+from . import netcircus_paths
+from .host import Host
+from .switch import Switch
+from .cable import Cable
 import os
 import threading
 import time

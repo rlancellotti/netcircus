@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkPopoverMenu" id="popover1">
+  <object class="GtkPopoverMenu" id="NcFilePopover">
     <property name="can-focus">False</property>
     <child>
       <object class="GtkBox">
@@ -210,7 +210,7 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="receives-default">True</property>
-            <property name="popover">popover1</property>
+            <property name="popover">NcFilePopover</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
@@ -218,9 +218,6 @@
                 <property name="stock">gtk-file</property>
               </object>
             </child>
-            <style>
-              <class name="asdasdaù"/>
-            </style>
           </object>
           <packing>
             <property name="position">4</property>
@@ -229,4 +226,62 @@
       </object>
     </child>
   </template>
+  <object class="GtkFileChooserDialog" id="NcSaveDialog">
+    <property name="can-focus">False</property>
+    <property name="type-hint">dialog</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can-focus">False</property>
+            <property name="layout-style">end</property>
+            <child>
+              <object class="GtkButton" id="btnCancel">
+                <property name="label">gtk-close</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnSave">
+                <property name="label">gtk-save</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkFileFilter" id="filter_tgz">
+    <patterns>
+      <pattern>*.tgz</pattern>
+    </patterns>
+  </object>
 </interface>

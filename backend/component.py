@@ -1,4 +1,4 @@
-import netcircus_paths
+from . import netcircus_paths
 import os
 import logging 
 import threading

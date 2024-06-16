@@ -1,5 +1,5 @@
-import netcircus_paths
-from component import Component
+from . import netcircus_paths
+from .component import Component
 import socket
 import os
 import time
@@ -32,7 +32,8 @@ class Host(Component):
         self.height = data['height' ] if 'height' in data.keys() else '0.0'
         self.check_cow(self.cow, self.fs)
         self.ready=False
-        self.console = self.id + '_cmd'
+        #self.console = self.id + '_cmd'
+        self.console = self.id
         self.console_signals['stop'] = 'cad'
         self.console_signals['halt'] = 'halt'
         self.console_signals['check'] = 'version > /dev/null 2>&1'

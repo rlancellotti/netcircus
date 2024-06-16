@@ -1,6 +1,6 @@
-import netcircus_paths
-from host import Host
-from switch import Switch
+from . import netcircus_paths
+from .host import Host
+from .switch import Switch
 import os
 
 class Cable:

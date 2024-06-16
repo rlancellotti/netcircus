@@ -1,11 +1,11 @@
 import os
 import time
 import string
-import netcircus_paths
-from host import Host
-from switch import Switch
-from network import Network
-from cable import Cable
+from . import netcircus_paths
+from .host import Host
+from .switch import Switch
+from .network import Network
+from .cable import Cable
 
 def check_string(s):
     invalid_chars = set(string.punctuation.replace("_", ""))
@@ -24,7 +24,7 @@ def simple_main():
     network = Network('test_network')
     host1 = Host(network, data={'id': 'host1', 'name':'host1', 'mem': 96})
     host2 = Host(network, data={'id': 'host2', 'name':'host2', 'mem': 96})
-    switch1 = Switch(network, data={'id':'switch1'})
+    switch1 = Switch(network, data={'id':'switch1', 'terminal': True})
     Cable(network, 'cable1', 'cable1', host1, 0, switch1, 1)
     Cable(network, 'cable2', 'cable1', host2, 0, switch1, 2)
 
